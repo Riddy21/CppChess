@@ -1,3 +1,7 @@
+# Vim and mac stuff
+.*.swp
+.DS_Store
+
 # Prerequisites
 *.d
 
