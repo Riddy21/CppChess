@@ -2,6 +2,9 @@
 .*.swp
 .DS_Store
 
+# Ignore build
+/build
+
 # Prerequisites
 *.d
 
