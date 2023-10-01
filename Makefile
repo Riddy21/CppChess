@@ -40,9 +40,11 @@ $(APP_DIR)/$(TARGET): $(OBJECTS)
 $(SWIG_DIR)/%_wrap.cpp: $(INCLUDE_DIR)/%.h
 	$(SWIG) $(SWIGFLAGS) -o $@ $<
 
-$(SWIG_DIR)/_%.so: $(SWIG_DIR)/%_wrap.cpp $(SRC_DIR)/%.cpp
-	python3 setup.py build_ext --inplace $(basename $@) $(basename $(notdir $@)) $^ ./$(INCLUDE_DIR)
-	rm -r build/temp*
+$(SWIG_DIR)/%_wrap.o: $(SWIG_DIR)/%_wrap.cpp
+	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
+
+$(SWIG_DIR)/_%.so: $(SWIG_DIR)/%_wrap.o $(OBJ_DIR)/%.o
+	$(CXX) $(SWIG_CXX_SO_FLAGS) -g $^ -o $@
 
 
 -include $(DEPENDENCIES)
