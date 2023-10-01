@@ -1,27 +1,49 @@
-CXX      := -c++
-CXXFLAGS := -pedantic-errors -Wall -Wextra -Werror -std=c++14
+SWIG 	 := -swig
+SWIGFLAGS:= -c++ -python
+CXX      := -gcc
+CXXFLAGS := -Wno-unused-result -Wall -Wno-deprecated-declarations \
+			-Wsign-compare -Wunreachable-code -fno-common -dynamic -fwrapv \
+			-arch x86_64 -g
+SWIG_CXX_SO_FLAGS := -bundle -undefined dynamic_lookup -arch x86_64
 LDFLAGS  := -L/usr/lib -lstdc++ -lm
 BUILD    := ./build
 OBJ_DIR  := $(BUILD)/objects
 APP_DIR  := $(BUILD)/apps
+SWIG_DIR := $(BUILD)/swig
+INCLUDE_DIR := include
+SRC_DIR := src
 TARGET   := chess
-INCLUDE  := -Iinclude/
-SRC      :=                      \
-   $(wildcard src/*.cpp)         \
+INCLUDE  := -I $(INCLUDE_DIR) \
+			-I /Library/Frameworks/Python.framework/Versions/3.8/include/python3.8
 
-OBJECTS  := $(SRC:%.cpp=$(OBJ_DIR)/%.o)
+SRC      :=                      \
+   $(wildcard $(SRC_DIR)/*.cpp)
+
+SWIG_MODULES := board
+
+OBJECTS  := $(SRC:$(SRC_DIR)%.cpp=$(OBJ_DIR)/%.o)
+HEADERS  := $(SRC:$(SRC_DIR)%.cpp=$(INCLUDE_DIR)/%.h)
+SWIG_CPP_MODULES := $(SWIG_MODULES:%=$(SWIG_DIR)/%_wrap.cpp)
+SWIG_OBJ_MODULES := $(SWIG_MODULES:%=$(SWIG_DIR)/%_wrap.o)
+SWIG_SO_MODULES := $(SWIG_MODULES:%=$(SWIG_DIR)/_%.so)
 DEPENDENCIES \
          := $(OBJECTS:.o=.d)
 
-all: build $(APP_DIR)/$(TARGET)
+all: build $(APP_DIR)/$(TARGET) $(SWIG_SO_MODULES)
 
-$(OBJ_DIR)/%.o: %.cpp
-	@mkdir -p $(@D)
-	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -MMD -o $@
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
 
 $(APP_DIR)/$(TARGET): $(OBJECTS)
-	@mkdir -p $(@D)
 	$(CXX) $(CXXFLAGS) -o $(APP_DIR)/$(TARGET) $^ $(LDFLAGS)
+
+$(SWIG_DIR)/%_wrap.cpp: $(INCLUDE_DIR)/%.h
+	$(SWIG) $(SWIGFLAGS) -o $@ $<
+
+$(SWIG_DIR)/_%.so: $(SWIG_DIR)/%_wrap.cpp $(SRC_DIR)/%.cpp
+	python3 setup.py build_ext --inplace $(basename $@) $(basename $(notdir $@)) $^ ./$(INCLUDE_DIR)
+	rm -r build/temp*
+
 
 -include $(DEPENDENCIES)
 
@@ -30,16 +52,18 @@ $(APP_DIR)/$(TARGET): $(OBJECTS)
 build:
 	@mkdir -p $(APP_DIR)
 	@mkdir -p $(OBJ_DIR)
+	@mkdir -p $(SWIG_DIR)
 
-debug: CXXFLAGS += -DDEBUG -g
+debug: CXXFLAGS += -DNDEBUG -g
 debug: all
 
-release: CXXFLAGS += -O2
+release: CXXFLAGS += -O3
 release: all
 
 clean:
 	-@rm -rvf $(OBJ_DIR)/*
 	-@rm -rvf $(APP_DIR)/*
+	-@rm -rvf $(SWIG_DIR)/*
 
 info:
 	@echo "[*] Application dir: ${APP_DIR}     "

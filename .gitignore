@@ -2,6 +2,9 @@
 .*.swp
 .DS_Store
 
+# Python things
+__pycache__
+
 # Ignore build
 /build
 
