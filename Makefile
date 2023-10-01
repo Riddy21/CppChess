@@ -3,15 +3,17 @@ SWIGFLAGS:= -c++ -python
 CXX      := -gcc
 CXXFLAGS := -Wno-unused-result -Wall -Wno-deprecated-declarations \
 			-Wsign-compare -Wunreachable-code -fno-common -dynamic -fwrapv \
-			-arch x86_64 -g
+			-arch x86_64 -g -MD -MP
 SWIG_CXX_SO_FLAGS := -bundle -undefined dynamic_lookup -arch x86_64
 LDFLAGS  := -L/usr/lib -lstdc++ -lm
 BUILD    := ./build
 OBJ_DIR  := $(BUILD)/objects
 APP_DIR  := $(BUILD)/apps
 SWIG_DIR := $(BUILD)/swig
+LOG_DIR := $(BUILD)/log
 INCLUDE_DIR := include
 SRC_DIR := src
+TEST_DIR := utests
 TARGET   := chess
 INCLUDE  := -I $(INCLUDE_DIR) \
 			-I /Library/Frameworks/Python.framework/Versions/3.8/include/python3.8
@@ -26,10 +28,11 @@ HEADERS  := $(SRC:$(SRC_DIR)%.cpp=$(INCLUDE_DIR)/%.h)
 SWIG_CPP_MODULES := $(SWIG_MODULES:%=$(SWIG_DIR)/%_wrap.cpp)
 SWIG_OBJ_MODULES := $(SWIG_MODULES:%=$(SWIG_DIR)/%_wrap.o)
 SWIG_SO_MODULES := $(SWIG_MODULES:%=$(SWIG_DIR)/_%.so)
+UNITTEST := $(SWIG_MODULES:%=$(LOG_DIR)/test_%.py.out)
 DEPENDENCIES \
          := $(OBJECTS:.o=.d)
 
-all: build $(APP_DIR)/$(TARGET) $(SWIG_SO_MODULES)
+all: build $(OBJECTS) $(SWIG_SO_MODULES) $(UNITTEST) $(APP_DIR)/$(TARGET)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
@@ -46,15 +49,20 @@ $(SWIG_DIR)/%_wrap.o: $(SWIG_DIR)/%_wrap.cpp
 $(SWIG_DIR)/_%.so: $(SWIG_DIR)/%_wrap.o $(OBJ_DIR)/%.o
 	$(CXX) $(SWIG_CXX_SO_FLAGS) -g $^ -o $@
 
+$(LOG_DIR)/test_%.py.out: $(TEST_DIR)/test_%.py $(SWIG_DIR)/_%.so
+	export PYTHONPATH=$(SWIG_DIR); python3 -m unittest $< 2>&1 | tee $@
 
 -include $(DEPENDENCIES)
 
 .PHONY: all build clean debug release info test
 
+test: $(UNITTEST)
+
 build:
 	@mkdir -p $(APP_DIR)
 	@mkdir -p $(OBJ_DIR)
 	@mkdir -p $(SWIG_DIR)
+	@mkdir -p $(LOG_DIR)
 
 debug: CXXFLAGS += -DNDEBUG -g
 debug: all
@@ -66,6 +74,7 @@ clean:
 	-@rm -rvf $(OBJ_DIR)/*
 	-@rm -rvf $(APP_DIR)/*
 	-@rm -rvf $(SWIG_DIR)/*
+	-@rm -rvf $(LOG_DIR)/*
 
 info:
 	@echo "[*] Application dir: ${APP_DIR}     "
