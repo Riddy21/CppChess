@@ -1,9 +1,9 @@
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
-	CXX      := x86_64-linux-gnu-g++
+	CXX      := clang++
 	CXXFLAGS := -pthread -Wno-unused-result -Wsign-compare -DNDEBUG -g -fwrapv -O2 -Wall -g -fstack-protector-strong \
 				-Wformat -Werror=format-security -g -fwrapv -O2 -g -fstack-protector-strong -Wformat -Werror=format-security \
-				-Wdate-time -D_FORTIFY_SOURCE=2 -fPIC
+				-Wdate-time -D_FORTIFY_SOURCE=2 -fPIC -std=c++17 -Wno-deprecated-declarations
 	SWIG_CXX_SO_FLAGS := -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-Bsymbolic-functions -Wl,-z,relro -g -fwrapv -O2 -Wl,-Bsymbolic-functions -Wl,-z,relro -g
 	PYTHON_PACKAGE := /usr/include/python3.8
 endif
@@ -49,7 +49,6 @@ DEPENDENCIES \
 all: build $(OBJECTS) $(SWIG_SO_MODULES) $(UNITTEST) $(APP_DIR)/$(TARGET)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
-	echo $(OS)
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
 
 $(APP_DIR)/$(TARGET): $(OBJECTS)
