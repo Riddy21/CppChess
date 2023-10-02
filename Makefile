@@ -50,14 +50,14 @@ $(SWIG_DIR)/%_wrap.o: $(SWIG_DIR)/%_wrap.cpp
 $(SWIG_DIR)/_%.so: $(SWIG_DIR)/%_wrap.o $(OBJECTS)
 	$(CXX) $(CXXFLAGS) $(SWIG_CXX_SO_FLAGS) -g $^ -o $@ $(LDFLAGS)
 
-$(LOG_DIR)/test_%.py.out: $(TEST_DIR)/test_%.py $(SWIG_DIR)/_%.so
-	export PYTHONPATH=$(SWIG_DIR); python3 -m unittest $< 2>&1 | tee $@
-
 -include $(DEPENDENCIES)
 
-.PHONY: all build clean debug release info test $(TEST_TARGETS)
+.PHONY: all build clean debug release info test $(TEST_TARGETS) $(UNITTEST)
 
 $(TEST_TARGETS): test_%: $(SWIG_SO_MODULES) $(LOG_DIR)/test_%.py.out
+
+$(UNITTEST): $(LOG_DIR)/test_%.py.out: $(TEST_DIR)/test_%.py $(SWIG_DIR)/_%.so
+	export PYTHONPATH=$(SWIG_DIR); python3 -m unittest $< 2>&1 | tee $@
 
 test: $(UNITTEST)
 

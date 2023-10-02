@@ -5,8 +5,7 @@
 #include "board.h"
 %}
 
-%include <std_vector.i>
-%template(COORD) std::vector<int>;
+%include "settings.h"
 
 #endif
 #ifndef BOARD_H
@@ -14,14 +13,11 @@
 
 #include <string>
 #include <map>
-#include <vector>
 #include <stdio.h>
 
 #include "settings.h"
 
 using namespace std;
-
-typedef vector<int> COORD;
 
 class Board {
     struct Square {

@@ -1,7 +1,7 @@
 import unittest
 
 import rules
-from board import Board, COORD
+from board import Board
 
 class TestRules(unittest.TestCase):
     """
@@ -11,4 +11,6 @@ class TestRules(unittest.TestCase):
         self.board = Board()
 
     def test_detect_obstruction(self):
-        obstr = rules.detect_obstruction(COORD((2, 3)), COORD((2, 3)), self.board)
+        # Invalid parameters
+        with self.assertRaises(RuntimeError):
+            rules.detect_obstruction((2, 3), (2, 3), self.board)

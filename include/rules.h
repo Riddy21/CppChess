@@ -4,7 +4,7 @@
 %{
 #include "rules.h"
 %}
-%include "board.h"
+%include "settings.h"
 
 #endif
 #ifndef RULES_H
@@ -13,9 +13,8 @@
 #include <stdio.h>
 #include <stdexcept>
 
+#include "settings.h"
 #include "board.h"
-
-//namespace logging = spdlog;
 
 namespace Rules {
     enum OBSTRUCT_TYPE{
@@ -26,10 +25,13 @@ namespace Rules {
 
     /**
      * @brief Detect if the piece is obstructed
+     * @param source Where the piece is moving from
+     * @param target Where the piece is intending to move to
+     * @param board The board where the piece is moving
      * 
      * @return OBSTRUCT_TYPE
      */
-    OBSTRUCT_TYPE detect_obstruction(COORD * source, COORD * target, Board * board);
+    OBSTRUCT_TYPE detect_obstruction(COORD source, COORD target, Board * board);
 };
 
 #endif
