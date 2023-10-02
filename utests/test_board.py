@@ -8,8 +8,7 @@ class TestBoard(unittest.TestCase):
     def setUp(self):
         pass
 
-    def test_set_board(self):
-        board = Board()
-
-        print(dir(board))
+    def test_get_board_from_file(self):
+        # TODO: To be implemented
+        pass
 

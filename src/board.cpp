@@ -3,20 +3,22 @@
 using namespace std;
 
 Board::Board(){
-    printf("YOOOOOOO\n");
+    // Nothing to initialize
+    return;
 }
 
-Board Board::get_board(){
-    printf("Board got\n");
-    return Board();
+Board * Board::get_board_from_file(char * filepath){
+    Board * new_board = new Board();
+    set_board(new_board, filepath);
+    return new_board;
 }
 
-Board Board::get_board_from_file(string filepath){
-    printf("Board got from file %s\n", filepath.c_str());
-    return Board();
+void Board::set_board(Board * board, char * filepath){
+    // TODO: To be implemented
 }
 
-void Board::set_board(){
-    printf("Board set\n");
+const char * Board::__str__(){
+    // TODO: To be implemented
+    return (char *) "Board is printed";
 }
 

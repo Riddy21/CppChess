@@ -1,9 +1,9 @@
-SWIG 	 := -swig
+SWIG 	 := swig
 SWIGFLAGS:= -c++ -python
-CXX      := -gcc
+CXX      := gcc
 CXXFLAGS := -Wno-unused-result -Wall -Wno-deprecated-declarations \
 			-Wsign-compare -Wunreachable-code -fno-common -dynamic -fwrapv \
-			-arch x86_64 -g -MD -MP
+			-arch x86_64 -g -MD -MP -std=c++17 -stdlib=libc++
 SWIG_CXX_SO_FLAGS := -bundle -undefined dynamic_lookup -arch x86_64
 LDFLAGS  := -L/usr/lib -lstdc++ -lm
 BUILD    := ./build
@@ -21,8 +21,9 @@ INCLUDE  := -I $(INCLUDE_DIR) \
 SRC      :=                      \
    $(wildcard $(SRC_DIR)/*.cpp)
 
-SWIG_MODULES := board
+SWIG_MODULES := board rules
 
+TEST_TARGETS := $(SWIG_MODULES:%=test_%)
 OBJECTS  := $(SRC:$(SRC_DIR)%.cpp=$(OBJ_DIR)/%.o)
 HEADERS  := $(SRC:$(SRC_DIR)%.cpp=$(INCLUDE_DIR)/%.h)
 SWIG_CPP_MODULES := $(SWIG_MODULES:%=$(SWIG_DIR)/%_wrap.cpp)
@@ -41,20 +42,22 @@ $(APP_DIR)/$(TARGET): $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -o $(APP_DIR)/$(TARGET) $^ $(LDFLAGS)
 
 $(SWIG_DIR)/%_wrap.cpp: $(INCLUDE_DIR)/%.h
-	$(SWIG) $(SWIGFLAGS) -o $@ $<
+	$(SWIG) $(SWIGFLAGS) -o $@ -l $<
 
 $(SWIG_DIR)/%_wrap.o: $(SWIG_DIR)/%_wrap.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
 
-$(SWIG_DIR)/_%.so: $(SWIG_DIR)/%_wrap.o $(OBJ_DIR)/%.o
-	$(CXX) $(SWIG_CXX_SO_FLAGS) -g $^ -o $@
+$(SWIG_DIR)/_%.so: $(SWIG_DIR)/%_wrap.o $(OBJECTS)
+	$(CXX) $(CXXFLAGS) $(SWIG_CXX_SO_FLAGS) -g $^ -o $@ $(LDFLAGS)
 
 $(LOG_DIR)/test_%.py.out: $(TEST_DIR)/test_%.py $(SWIG_DIR)/_%.so
 	export PYTHONPATH=$(SWIG_DIR); python3 -m unittest $< 2>&1 | tee $@
 
 -include $(DEPENDENCIES)
 
-.PHONY: all build clean debug release info test
+.PHONY: all build clean debug release info test $(TEST_TARGETS)
+
+$(TEST_TARGETS): test_%: $(SWIG_SO_MODULES) $(LOG_DIR)/test_%.py.out
 
 test: $(UNITTEST)
 
