@@ -1,10 +1,23 @@
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Linux)
+	CXX      := x86_64-linux-gnu-g++
+	CXXFLAGS := -pthread -Wno-unused-result -Wsign-compare -DNDEBUG -g -fwrapv -O2 -Wall -g -fstack-protector-strong \
+				-Wformat -Werror=format-security -g -fwrapv -O2 -g -fstack-protector-strong -Wformat -Werror=format-security \
+				-Wdate-time -D_FORTIFY_SOURCE=2 -fPIC
+	SWIG_CXX_SO_FLAGS := -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-Bsymbolic-functions -Wl,-z,relro -g -fwrapv -O2 -Wl,-Bsymbolic-functions -Wl,-z,relro -g
+	PYTHON_PACKAGE := /usr/include/python3.8
+endif
+ifeq ($(UNAME_S),Darwin)
+	CXX      := gcc
+	CXXFLAGS := -Wno-unused-result -Wall -Wno-deprecated-declarations \
+				-Wsign-compare -Wunreachable-code -fno-common -dynamic -fwrapv \
+				-arch x86_64 -g -MD -MP -std=c++17 -stdlib=libc++
+	SWIG_CXX_SO_FLAGS := -bundle -undefined dynamic_lookup -arch x86_64
+	PYTHON_PACKAGE := /Library/Frameworks/Python.framework/Versions/3.8/include/python3.8
+endif
+
 SWIG 	 := swig
 SWIGFLAGS:= -c++ -python
-CXX      := gcc
-CXXFLAGS := -Wno-unused-result -Wall -Wno-deprecated-declarations \
-			-Wsign-compare -Wunreachable-code -fno-common -dynamic -fwrapv \
-			-arch x86_64 -g -MD -MP -std=c++17 -stdlib=libc++
-SWIG_CXX_SO_FLAGS := -bundle -undefined dynamic_lookup -arch x86_64
 LDFLAGS  := -L/usr/lib -lstdc++ -lm
 BUILD    := ./build
 OBJ_DIR  := $(BUILD)/objects
@@ -16,7 +29,7 @@ SRC_DIR := src
 TEST_DIR := utests
 TARGET   := chess
 INCLUDE  := -I $(INCLUDE_DIR) \
-			-I /Library/Frameworks/Python.framework/Versions/3.8/include/python3.8
+			-I $(PYTHON_PACKAGE)
 
 SRC      :=                      \
    $(wildcard $(SRC_DIR)/*.cpp)
@@ -36,6 +49,7 @@ DEPENDENCIES \
 all: build $(OBJECTS) $(SWIG_SO_MODULES) $(UNITTEST) $(APP_DIR)/$(TARGET)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+	echo $(OS)
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
 
 $(APP_DIR)/$(TARGET): $(OBJECTS)

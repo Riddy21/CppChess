@@ -24,7 +24,7 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
-#include <vector>
+#include <array>
 
 #define DEFAULT_BOARD_PRESETS_PATH "Presets/default.txt"
 #define BOARD_HEIGHT 8
