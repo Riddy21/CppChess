@@ -8,7 +8,7 @@ ifeq ($(UNAME_S),Linux)
 	PYTHON_PACKAGE := /usr/include/python3.8
 endif
 ifeq ($(UNAME_S),Darwin)
-	CXX      := gcc
+	CXX      := clang++
 	CXXFLAGS := -Wno-unused-result -Wall -Wno-deprecated-declarations \
 				-Wsign-compare -Wunreachable-code -fno-common -dynamic -fwrapv \
 				-arch x86_64 -g -MD -MP -std=c++17 -stdlib=libc++

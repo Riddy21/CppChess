@@ -9,9 +9,9 @@
 #endif
 #ifndef RULES_H
 #define RULES_H
+#pragma once // Make sure it's compiled only once
 
 #include <stdio.h>
-#include <stdexcept>
 
 #include "settings.h"
 #include "board.h"
