@@ -12,7 +12,7 @@ class TestBoard(unittest.TestCase):
     def test_set_board(self):
         board = Board('presets/default.txt')
         board.set_board("presets/check.txt")
-        file = open('Presets/check.txt', 'r')
+        file = open('presets/check.txt', 'r')
         golden = file.read()
 
         # make sure the file and the object is the same

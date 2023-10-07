@@ -26,6 +26,7 @@
 #pragma once // Make sure it's compiled only once
 
 #include <array>
+#include <vector>
 #include <string>
 #include <unordered_map>
 #include <stdexcept>
@@ -35,6 +36,7 @@
 #include <cctype>
 #include <cstring>
 #include <stdio.h>
+#include <limits.h>
 
 #include "utils.h"
 
