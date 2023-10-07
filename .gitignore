@@ -3,6 +3,7 @@
 .DS_Store
 
 # VScode stuff
+.vscode
 *.code-workspace
 
 # Python things
