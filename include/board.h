@@ -6,6 +6,7 @@
 %}
 
 %include "settings.h";
+%include "piece.h"
 %include <std_vector.i>;
 %include <std_pair.i>;
 

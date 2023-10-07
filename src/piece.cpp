@@ -1,12 +1,12 @@
-#include "board.h"
+#include "piece.h"
 
 using namespace std;
 
-Piece::Piece(COLOR color, PIECE type) {
+Piece::Piece(COLOR color, TYPE type) {
     this->color = color;
     this->num_moves = 0;
     this->type = type;
-    this->value = PIECE_VALUES.at(type);
+    this->value = get_value(type);
 }
 
 const char * Piece::__str__() const {

@@ -31,14 +31,14 @@ void Board::set_board(char * filepath){
                 continue;
             }
             COLOR piece_color;
-            PIECE piece_type;
+            TYPE piece_type;
             // Deterime the color
             if (isupper(piece.c_str()[0]))
                 piece_color = WHITE;
             else
                 piece_color = BLACK;
             // Determine the type
-            piece_type = (PIECE)toupper(piece.c_str()[0]);
+            piece_type = (TYPE)toupper(piece.c_str()[0]);
             // Try making the piece
             try{
                 const Piece * new_piece = new Piece(piece_color, piece_type);
@@ -130,7 +130,6 @@ Board * Board::copy() const{
 unsigned Board::size() const{
     return board_map.size();
 }
-
 
 
 const Piece * Board::BLANK_PIECE = new const Piece(NONE, BLANK);

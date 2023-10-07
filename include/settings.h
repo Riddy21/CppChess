@@ -7,10 +7,11 @@
 
 %include <std_array.i>;
 %include <std_except.i>;
+%include <std_unordered_map.i>;
 
 %template(COORD) std::array<unsigned, 2>;
 %template(MOVE_COORDS) std::array<std::array<unsigned, 2>, 2>;
-%apply char { PIECE };
+%apply char { TYPE };
 
 // Catch all exceptions in C++ and put them as Runtime errors
 %exception {
@@ -24,7 +25,6 @@
 #endif
 #ifndef SETTINGS_H
 #define SETTINGS_H
-#pragma once // Make sure it's compiled only once
 
 #include <array>
 #include <vector>
@@ -55,7 +55,7 @@ enum COLOR{
     NONE=2,
 };
 
-enum PIECE{
+enum TYPE{
     PAWN = 'P',
     KING = 'K',
     QUEEN = 'Q',
@@ -65,13 +65,17 @@ enum PIECE{
     BLANK = '-',
 };
 
-static const std::unordered_map<PIECE, unsigned> PIECE_VALUES = {
-    {BLANK, 0},
-    {PAWN, 1},
-    {KNIGHT, 3},
-    {BISHOP, 3},
-    {ROOK, 5},
-    {QUEEN, 9},
-    {KING, INT_MAX}, // INT_MAX is halfway from the largest number to avoid overflow
-};
+constexpr unsigned get_value(TYPE piece) {
+    switch (piece) {
+        case BLANK: return 0;
+        case PAWN: return 1;
+        case KNIGHT: return 3;
+        case BISHOP: return 3;
+        case ROOK: return 5;
+        case QUEEN: return 9;
+        case KING: return INT_MAX;
+        default: throw std::logic_error("Piece " + std::string(1, piece) + " not found.") ;  // Handle unknown piece types
+    }
+}
+ 
 #endif

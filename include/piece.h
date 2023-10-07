@@ -20,7 +20,7 @@ class Piece {
     public:
         COLOR color;
         unsigned num_moves = 0;
-        PIECE type;
+        TYPE type;
         unsigned value;
         /**
          * @brief Construct a new Piece object
@@ -28,7 +28,7 @@ class Piece {
          * @param color 
          * @param type 
          */
-        Piece(COLOR color, PIECE type);
+        Piece(COLOR color, TYPE type);
 
         /**
          * @brief Converts the board to string for python
