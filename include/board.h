@@ -15,6 +15,7 @@
 %template(BOARD_ITEMS) std::vector<std::pair<COORD, const Piece *>>;
 
 #endif
+
 #ifndef BOARD_H
 #define BOARD_H
 #pragma once // Make sure it's compiled only once

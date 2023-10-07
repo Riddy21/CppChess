@@ -34,7 +34,7 @@ INCLUDE  := -I $(INCLUDE_DIR) \
 SRC      :=                      \
    $(wildcard $(SRC_DIR)/*.cpp)
 
-SWIG_MODULES := board rules
+SWIG_MODULES := board rules piece
 
 TEST_TARGETS := $(SWIG_MODULES:%=test_%)
 OBJECTS  := $(SRC:$(SRC_DIR)%.cpp=$(OBJ_DIR)/%.o)

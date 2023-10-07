@@ -42,7 +42,6 @@
 
 #include "utils.h"
 
-
 #define DEFAULT_BOARD_PRESETS_PATH "Presets/default.txt"
 #define BOARD_HEIGHT 8
 #define BOARD_WIDTH 8
@@ -63,7 +62,7 @@ enum PIECE{
     BISHOP = 'B',
     KNIGHT = 'N',
     ROOK = 'R',
-    BLANK = '-'
+    BLANK = '-',
 };
 
 static const std::unordered_map<PIECE, unsigned> PIECE_VALUES = {
@@ -73,6 +72,6 @@ static const std::unordered_map<PIECE, unsigned> PIECE_VALUES = {
     {BISHOP, 3},
     {ROOK, 5},
     {QUEEN, 9},
-    {KING, INT_MAX} // INT_MAX is halfway from the largest number to avoid overflow
+    {KING, INT_MAX}, // INT_MAX is halfway from the largest number to avoid overflow
 };
 #endif
