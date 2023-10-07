@@ -10,6 +10,7 @@
 
 %template(COORD) std::array<unsigned, 2>;
 %template(MOVE_COORDS) std::array<std::array<unsigned, 2>, 2>;
+%apply char { PIECE };
 
 // Catch all exceptions in C++ and put them as Runtime errors
 %exception {
@@ -30,6 +31,7 @@
 #include <string>
 #include <unordered_map>
 #include <stdexcept>
+#include <utility>
 #include <fstream>
 #include <iostream>
 #include <sstream>

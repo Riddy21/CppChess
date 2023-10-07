@@ -1,6 +1,6 @@
 import unittest
 import faulthandler
-from board import Board
+from board import *
 
 class TestBoard(unittest.TestCase):
     """
@@ -34,7 +34,27 @@ class TestBoard(unittest.TestCase):
         board = Board('presets/check.txt')
 
         self.assertEqual(board.size(), 32)
-        self.assertEqual(board.size(), len(board.get_pieces()))
+
+        for key, value in board.items():
+            self.assertIsInstance(key, tuple)
+            self.assertIsInstance(value, Piece)
+
+        for key in board.coords():
+            self.assertIsInstance(key, tuple)
+
+        for value in board.pieces():
+            self.assertIsInstance(value, Piece)
+
+    def test_access_empty_piece(self):
+        board = Board('Presets/default.txt')
+
+        # try calling an empty piece
+        self.assertEqual(board[0, 3].type, BLANK)
+        self.assertEqual(board[0, 3].color, NONE)
+
+        # Try printing the length of board
+        self.assertEqual(board.size(), 4*8)
+
 
     def test_invalid_set_board(self):
         board = Board()

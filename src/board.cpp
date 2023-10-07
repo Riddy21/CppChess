@@ -2,23 +2,6 @@
 
 using namespace std;
 
-Piece::Piece(COLOR color, PIECE type) {
-    this->color = color;
-    this->num_moves = 0;
-    this->type = type;
-    this->value = PIECE_VALUES.at(type);
-}
-
-const char * Piece::__str__() const {
-    char * output = new char;
-    if (this->color == WHITE)
-        output[0] = toupper(type);
-    else
-        output[0] = tolower(type);
-    
-    return output;
-}
-
 Board::Board(char * filepath){
     this->set_board(filepath);
 }
@@ -26,12 +9,6 @@ Board::Board(char * filepath){
 Board::~Board(){
     // Deallocate the dict
     board_map.clear();
-}
-
-Board * Board::get_board_from_file(char * filepath){
-    Board * new_board = new Board();
-    new_board->set_board(filepath);
-    return new_board;
 }
 
 void Board::set_board(char * filepath){
@@ -101,18 +78,40 @@ const Piece * Board::get(COORD coord) const{
 
 void Board::set(COORD coord, const Piece * piece){
     if (piece->type == BLANK)
-        delete board_map[coord];
+        remove(coord);
     board_map[coord] = piece;
 }
 
-const vector<const Piece *> Board::get_pieces() const{
+const vector<const Piece *> Board::pieces() const{
     vector<const Piece *> pieces;
+    pieces.reserve(size());
 
     for (auto & [coord, piece] : board_map)
         pieces.push_back(piece);
 
     return pieces;
 }
+
+const vector<COORD> Board::coords() const{
+    vector<COORD> coords;
+    coords.reserve(size());
+
+    for (auto & [coord, piece] : board_map)
+        coords.push_back(coord);
+
+    return coords;
+}
+
+const vector<pair<COORD, const Piece *>> Board::items() const{
+    vector<pair<COORD, const Piece *>> pairs;
+    pairs.reserve(size());
+
+    for (auto & item : board_map)
+        pairs.push_back(item);
+
+    return pairs;
+}
+
 
 void Board::remove(COORD coord){
     if (board_map.contains(coord))
@@ -131,5 +130,7 @@ Board * Board::copy() const{
 unsigned Board::size() const{
     return board_map.size();
 }
+
+
 
 const Piece * Board::BLANK_PIECE = new const Piece(NONE, BLANK);

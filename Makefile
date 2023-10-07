@@ -70,7 +70,7 @@ $(SWIG_DIR)/_%.so: $(SWIG_DIR)/%_wrap.o $(OBJECTS)
 $(UNITTEST): $(LOG_DIR)/test_%.py.out: $(TEST_DIR)/test_%.py $(SWIG_DIR)/_%.so
 	export PYTHONPATH=$(SWIG_DIR); python3 -m unittest $< 2>&1 | tee -a $@
 
-$(TEST_TARGETS): test_%: $(SWIG_SO_MODULES) $(LOG_DIR)/test_%.py.out
+$(TEST_TARGETS): test_%: $(SWIG_DIR)/_%.so $(LOG_DIR)/test_%.py.out
 
 test: $(UNITTEST)
 

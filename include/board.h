@@ -5,11 +5,14 @@
 #include "board.h"
 %}
 
-%include "settings.h"
+%include "settings.h";
 %include <std_vector.i>;
+%include <std_pair.i>;
 
-%template(PIECE_LIST) std::vector<const Piece *>;
-
+%template(BOARD_PIECES) std::vector<const Piece *>;
+%template(BOARD_COORDS) std::vector<COORD>;
+%template(BOARD_ITEM) std::pair<COORD, const Piece *>;
+%template(BOARD_ITEMS) std::vector<std::pair<COORD, const Piece *>>;
 
 #endif
 #ifndef BOARD_H
@@ -17,30 +20,9 @@
 #pragma once // Make sure it's compiled only once
 
 #include "settings.h"
+#include "piece.h"
 
 using namespace std;
-
-class Piece {
-    public:
-        COLOR color;
-        unsigned num_moves = 0;
-        PIECE type;
-        unsigned value;
-        /**
-         * @brief Construct a new Piece object
-         * 
-         * @param color 
-         * @param type 
-         */
-        Piece(COLOR color, PIECE type);
-
-        /**
-         * @brief Converts the board to string for python
-         * 
-         * @return const char* 
-         */
-        const char* __str__() const;
-};
 
 class Board {
 public:
@@ -62,14 +44,6 @@ public:
      * 
      */
     ~Board();
-
-    /**
-     * @brief Get the board from a filepath
-     * 
-     * @param filepath 
-     * @return Board* 
-     */
-    static Board * get_board_from_file(char * filepath);
 
     /**
      * @brief function to create another copy of the board object
@@ -113,11 +87,25 @@ public:
     unsigned size() const;
 
     /**
-     * @brief Gets a list of all the items in the dict
+     * @brief Gets a list of all the pieces in board
      * 
      * @return vector<const Piece *> 
      */
-    const vector<const Piece *> get_pieces() const;
+    const vector<const Piece *> pieces() const;
+
+    /**
+     * @brief Gets the list of all coordinates of pieces
+     * 
+     * @return const vector<COORD> 
+     */
+    const vector<COORD> coords() const;
+
+    /**
+     * @brief Returns the pair of coordinate and items from the board
+     * 
+     * @return const vector<pair<COORD, const Piece *>> 
+     */
+    const vector<pair<COORD, const Piece *>> items() const;
 
     /**
      * @brief Convert to string
