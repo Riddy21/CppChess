@@ -5,6 +5,7 @@
 #include "rules.h"
 %}
 %include "settings.h"
+%include "board.h"
 
 #endif
 #ifndef RULES_H

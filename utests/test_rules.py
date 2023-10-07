@@ -11,6 +11,20 @@ class TestRules(unittest.TestCase):
         self.board = Board()
 
     def test_detect_obstruction(self):
+        self.board.set_board('presets/default.txt')
         # Invalid parameters
         with self.assertRaises(RuntimeError):
-            rules.detect_obstruction((2, 3), (2, 3), self.board)
+            rules.detect_obstruction((0, 0), (0, 0), self.board)
+
+        with self.assertRaises(RuntimeError):
+            rules.detect_obstruction((3, 3), (0, 0), self.board)
+
+        # Self obstruct
+        self.assertEqual(rules.detect_obstruction((0, 0), (0, 1), self.board), rules.SELF)
+
+        # No obstruction
+        self.assertEqual(rules.detect_obstruction((0, 1), (0, 2), self.board), rules.OPEN)
+
+        # Opponent obstruct
+        self.assertEqual(rules.detect_obstruction((0, 1), (7, 7), self.board), rules.OPPONENT)
+        
