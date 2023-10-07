@@ -2,23 +2,41 @@
 
 using namespace std;
 
+Piece::Piece(COLOR color, PIECE type) {
+    this->color = color;
+    this->num_moves = 0;
+    this->type = type;
+    this->value = PIECE_VALUES.at(type);
+}
+
+const char * Piece::__str__() const {
+    char * output = new char;
+    if (this->color == WHITE)
+        output[0] = toupper(type);
+    else
+        output[0] = tolower(type);
+    
+    return output;
+}
+
 Board::Board(char * filepath){
-    this->set_board(this, filepath);
+    this->set_board(filepath);
 }
 
 Board::~Board(){
-    //TODO: Loop through dictionary to deallocate all pieces
-
-    // TODO: Deallocate the dict
+    // Deallocate the dict
+    board_map.clear();
 }
 
 Board * Board::get_board_from_file(char * filepath){
     Board * new_board = new Board();
-    set_board(new_board, filepath);
+    new_board->set_board(filepath);
     return new_board;
 }
 
-void Board::set_board(Board * board, char * filepath){
+void Board::set_board(char * filepath){
+    //Reset board map
+    this->board_map.clear();
     // Output string
     string output;
     // Open config file
@@ -31,8 +49,10 @@ void Board::set_board(Board * board, char * filepath){
         col = 0;
         while (getline(line_stream, piece, ' ')){
             // Skip if empty
-            if (piece == "-")
+            if (piece == "-"){
+                col ++;
                 continue;
+            }
             COLOR piece_color;
             PIECE piece_type;
             // Deterime the color
@@ -44,10 +64,10 @@ void Board::set_board(Board * board, char * filepath){
             piece_type = (PIECE)toupper(piece.c_str()[0]);
             // Try making the piece
             try{
-                Piece * new_piece = new Piece(piece_color, piece_type);
-                board->board_map[{col, row}] = new_piece;
+                const Piece * new_piece = new Piece(piece_color, piece_type);
+                this->board_map[{col, row}] = new_piece;
             } catch (const exception& e){
-                throw runtime_error("Invalid Piece");
+                throw runtime_error("Invalid Piece " + string(1, piece_type));
             }
             col ++;
         }
@@ -55,17 +75,61 @@ void Board::set_board(Board * board, char * filepath){
     }
 }
 
-const char * Board::__str__(){
-    string output;
-    for (unsigned y=0; y<BOARD_HEIGHT, y++){
-        for (unsigned x=0; x<BOARD_WIDTH, x++){
+const char * Board::to_str() const{
+    string output = "";
+    for (unsigned y=0; y<BOARD_HEIGHT; y++){
+        for (unsigned x=0; x<BOARD_WIDTH; x++){
             //Find the piece
+            char type = *get({x, y})->__str__();
+            output += string(1,type) + " ";
         }
+        output.pop_back();
+        output += "\n";
     }
-    return output.c_str();
+
+    char * c_str_out = new char[output.length()+1];
+    strcpy(c_str_out, output.c_str());
+    return c_str_out;
 }
 
-Board * Board::copy_board(Board * board){
+const Piece * Board::get(COORD coord) const{
+    auto it = board_map.find(coord);
+    if (it != board_map.end())
+        return it->second;
+    return BLANK_PIECE;
+}
+
+void Board::set(COORD coord, const Piece * piece){
+    if (piece->type == BLANK)
+        delete board_map[coord];
+    board_map[coord] = piece;
+}
+
+const vector<const Piece *> Board::get_pieces() const{
+    vector<const Piece *> pieces;
+
+    for (auto & [coord, piece] : board_map)
+        pieces.push_back(piece);
+
+    return pieces;
+}
+
+void Board::remove(COORD coord){
+    if (board_map.contains(coord))
+        delete board_map[coord];
+}
+
+Board * Board::copy() const{
+    Board * new_board = new Board();
+    // Set the board with all the current pieces
+    for (auto & [coord, piece] : board_map)
+        new_board->set(coord, piece);
+
     return new Board();
 }
 
+unsigned Board::size() const{
+    return board_map.size();
+}
+
+const Piece * Board::BLANK_PIECE = new const Piece(NONE, BLANK);

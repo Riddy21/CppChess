@@ -3,7 +3,7 @@ ifeq ($(UNAME_S),Linux)
 	CXX      := clang++
 	CXXFLAGS := -pthread -Wno-unused-result -Wsign-compare -DNDEBUG -g -fwrapv -O2 -Wall -g -fstack-protector-strong \
 				-Wformat -Werror=format-security -g -fwrapv -O2 -g -fstack-protector-strong -Wformat -Werror=format-security \
-				-Wdate-time -D_FORTIFY_SOURCE=2 -fPIC -std=c++17 -Wno-deprecated-declarations
+				-Wdate-time -D_FORTIFY_SOURCE=2 -fPIC -std=c++20 -Wno-deprecated-declarations
 	SWIG_CXX_SO_FLAGS := -shared -Wl,-O1 -Wl,-Bsymbolic-functions -Wl,-Bsymbolic-functions -Wl,-z,relro -g -fwrapv -O2 -Wl,-Bsymbolic-functions -Wl,-z,relro -g
 	PYTHON_PACKAGE := /usr/include/python3.8
 endif
@@ -11,7 +11,7 @@ ifeq ($(UNAME_S),Darwin)
 	CXX      := clang++
 	CXXFLAGS := -Wno-unused-result -Wall -Wno-deprecated-declarations \
 				-Wsign-compare -Wunreachable-code -fno-common -dynamic -fwrapv \
-				-arch x86_64 -g -MD -MP -std=c++17 -stdlib=libc++
+				-arch x86_64 -g -MD -MP -std=c++20 -stdlib=libc++
 	SWIG_CXX_SO_FLAGS := -bundle -undefined dynamic_lookup -arch x86_64
 	PYTHON_PACKAGE := /Library/Frameworks/Python.framework/Versions/3.8/include/python3.8
 endif
@@ -67,10 +67,10 @@ $(SWIG_DIR)/_%.so: $(SWIG_DIR)/%_wrap.o $(OBJECTS)
 
 .PHONY: all build clean debug release info test $(TEST_TARGETS) $(UNITTEST)
 
-$(TEST_TARGETS): test_%: $(SWIG_SO_MODULES) $(LOG_DIR)/test_%.py.out
-
 $(UNITTEST): $(LOG_DIR)/test_%.py.out: $(TEST_DIR)/test_%.py $(SWIG_DIR)/_%.so
-	export PYTHONPATH=$(SWIG_DIR); python3 -m unittest $< 2>&1 | tee $@
+	export PYTHONPATH=$(SWIG_DIR); python3 -m unittest $< 2>&1 | tee -a $@
+
+$(TEST_TARGETS): test_%: $(SWIG_SO_MODULES) $(LOG_DIR)/test_%.py.out
 
 test: $(UNITTEST)
 

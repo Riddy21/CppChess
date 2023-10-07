@@ -6,6 +6,7 @@ using namespace std;
 int main(){
     printf("hello world!");
 
-    Board();
+    Board board = Board("presets/check.txt");
+    board.set({0, 0}, board.get({1, 1}));
     return 0;
 }

@@ -1,4 +1,5 @@
 import unittest
+import faulthandler
 from board import Board
 
 class TestBoard(unittest.TestCase):
@@ -6,10 +7,11 @@ class TestBoard(unittest.TestCase):
     Test for Board Chess object
     """
     def setUp(self):
-        pass
+        faulthandler.enable()
     
     def test_set_board(self):
-        board = Board('presets/check.txt')
+        board = Board('presets/default.txt')
+        board.set_board("presets/check.txt")
         file = open('Presets/check.txt', 'r')
         golden = file.read()
 
@@ -18,8 +20,24 @@ class TestBoard(unittest.TestCase):
 
         file.close()
 
+    def test_copy_board(self):
+        # Original
+        board1 = Board('presets/check.txt')
+        # Copy
+        board2 = board1.copy()
+
+        board1[1, 1] = board1[0,0]
+
+        self.assertNotEqual(str(board1), str(board2))
+
+    def test_iterate_board(self):
+        board = Board('presets/check.txt')
+
+        self.assertEqual(board.size(), 32)
+        self.assertEqual(board.size(), len(board.get_pieces()))
+
     def test_invalid_set_board(self):
         board = Board()
         with self.assertRaises(RuntimeError):
-            Board.set_board(board, 'presets/unknown_piece.txt')
+            board.set_board('presets/unknown_piece.txt')
 

@@ -2,6 +2,9 @@
 .*.swp
 .DS_Store
 
+# VScode stuff
+*.code-workspace
+
 # Python things
 __pycache__
 

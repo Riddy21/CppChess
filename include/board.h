@@ -6,6 +6,10 @@
 %}
 
 %include "settings.h"
+%include <std_vector.i>;
+
+%template(PIECE_LIST) std::vector<const Piece *>;
+
 
 #endif
 #ifndef BOARD_H
@@ -16,22 +20,30 @@
 
 using namespace std;
 
-class Board {
-public:
-    struct Piece {
+class Piece {
+    public:
         COLOR color;
         unsigned num_moves = 0;
         PIECE type;
         unsigned value;
+        /**
+         * @brief Construct a new Piece object
+         * 
+         * @param color 
+         * @param type 
+         */
+        Piece(COLOR color, PIECE type);
 
-        Piece(COLOR color, PIECE type) {
-            this->color = color;
-            this->num_moves = 0;
-            this->type = type;
-            this->value = PIECE_VALUES.at(type);
-        }
-    };
+        /**
+         * @brief Converts the board to string for python
+         * 
+         * @return const char* 
+         */
+        const char* __str__() const;
+};
 
+class Board {
+public:
     /**
      * @brief Construct a new Board object with a filepath
      * 
@@ -60,30 +72,94 @@ public:
     static Board * get_board_from_file(char * filepath);
 
     /**
-     * @brief Static function to create another copy of the board object
-     * 
-     * @param board board you are going to copy
+     * @brief function to create another copy of the board object
+     *
      * @return Pointer to the new copied board
      */
-    static Board * copy_board(Board * board);
+    Board * copy() const;
     
     /**
-     * @brief Set the board object in place from file
+     * @brief Set the board object from file
      * 
-     * @param board board you want to set
      * @param filepath The filepath to the board
      */
-    static void set_board(Board * board, char * filepath);
+    void set_board(char * filepath);
+
+    /**
+     * @brief get the board object by coord
+     * 
+     * @return Piece* 
+     */
+    const Piece * get(COORD coord) const;
+
+    /**
+     * @brief set the board object by coord
+     * 
+     * @return Piece* 
+     */
+    void set(COORD coord, const Piece * piece);
+
+    /**
+     * @brief delete a piece on the board by coord
+     * 
+     */
+    void remove(COORD coord);
+
+    /**
+     * @brief gets the num of pieces
+     * 
+     * @return unsigned 
+     */
+    unsigned size() const;
+
+    /**
+     * @brief Gets a list of all the items in the dict
+     * 
+     * @return vector<const Piece *> 
+     */
+    const vector<const Piece *> get_pieces() const;
+
+    /**
+     * @brief Convert to string
+     * 
+     * @return const char* 
+     */
+    const char * to_str() const;
 
     /**
      * @brief Convert the board to a string for python
      * 
      * @return string of the board
      */
-    const char* __str__();
+    const char* __str__() const { return to_str(); }; 
+
+    /**
+     * @brief Python dictionary functions deleting item
+     * 
+     * @param coord 
+     */
+    void __delitem__(COORD coord) { remove(coord); }
+
+    /**
+     * @brief Python dictionary functions getting dict item
+     * 
+     * @param coord 
+     */
+    const Piece * __getitem__(COORD coord) const { return get(coord); }
+
+    /**
+     * @brief Python dictionary functions setting dict item
+     * 
+     * @param coord 
+     */
+    void __setitem__(COORD coord, const Piece * piece) { set(coord, piece); }
+
+
 
 private:
-    unordered_map<COORD, Piece *, ArrayHash> board_map;
+    static const Piece * BLANK_PIECE;
+    unordered_map<COORD, const Piece *, ArrayHash> board_map;
+
 };
 
 #endif

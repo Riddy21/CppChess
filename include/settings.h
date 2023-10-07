@@ -49,6 +49,7 @@ typedef std::array<COORD, 2> MOVE_COORDS;
 enum COLOR{
     WHITE=1,
     BLACK=0,
+    NONE=2,
 };
 
 enum PIECE{
@@ -58,9 +59,11 @@ enum PIECE{
     BISHOP = 'B',
     KNIGHT = 'N',
     ROOK = 'R',
+    BLANK = '-'
 };
 
 static const std::unordered_map<PIECE, unsigned> PIECE_VALUES = {
+    {BLANK, 0},
     {PAWN, 1},
     {KNIGHT, 3},
     {BISHOP, 3},
