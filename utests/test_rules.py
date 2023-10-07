@@ -1,7 +1,7 @@
 import unittest
 
 import rules
-#from board import Board
+from board import Board
 
 class TestRules(unittest.TestCase):
     """
