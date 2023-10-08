@@ -7,10 +7,13 @@
 
 %include <std_array.i>;
 %include <std_except.i>;
-%include <std_unordered_map.i>;
+%include <std_set.i>;
+%include <std_unordered_set.i>;
 
 %template(COORD) std::array<unsigned, 2>;
 %template(MOVE_COORDS) std::array<std::array<unsigned, 2>, 2>;
+%template(MOVESET) std::unordered_set<std::array<unsigned, 2>, ArrayHash>;
+
 %apply char { TYPE };
 
 // Catch all exceptions in C++ and put them as Runtime errors
@@ -30,6 +33,7 @@
 #include <vector>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <stdexcept>
 #include <utility>
 #include <fstream>
@@ -48,6 +52,7 @@
 
 typedef std::array<unsigned, 2> COORD;
 typedef std::array<COORD, 2> MOVE_COORDS;
+typedef std::unordered_set<COORD, ArrayHash> MOVESET;
 
 enum COLOR{
     WHITE=1,

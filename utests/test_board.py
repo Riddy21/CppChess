@@ -61,3 +61,15 @@ class TestBoard(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             board.set_board('presets/unknown_piece.txt')
 
+    def test_access_out_of_bounds(self):
+        board = Board('presets/default.txt')
+        with self.assertRaises(RuntimeError):
+            board[0, 8]
+        with self.assertRaises(RuntimeError):
+            board[8, 0]
+
+        with self.assertRaises(RuntimeError):
+            board[0, 8] = board[0, 0]
+        with self.assertRaises(RuntimeError):
+            board[8, 0] = board[0, 0]
+

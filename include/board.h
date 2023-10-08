@@ -150,6 +150,8 @@ private:
     static const Piece * BLANK_PIECE;
     unordered_map<COORD, const Piece *, ArrayHash> board_map;
 
+    static bool is_out_of_bounds(COORD coord);
+
 };
 
 #endif

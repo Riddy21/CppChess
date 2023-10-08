@@ -8,7 +8,7 @@ ifeq ($(UNAME_S),Linux)
 	PYTHON_PACKAGE := /usr/include/python3.8
 endif
 ifeq ($(UNAME_S),Darwin)
-	CXX      := g++
+	CXX      := clang++
 	CXXFLAGS := -Wno-unused-result -Wall -Wno-deprecated-declarations \
 				-Wsign-compare -Wunreachable-code -fno-common -dynamic -fwrapv \
 				-arch x86_64 -g -MD -MP -std=c++20 -stdlib=libc++
@@ -46,7 +46,7 @@ UNITTEST := $(SWIG_MODULES:%=$(LOG_DIR)/test_%.py.out)
 DEPENDENCIES \
          := $(OBJECTS:.o=.d)
 
-all: build $(OBJECTS) $(UNITTEST) $(APP_DIR)/$(TARGET)
+all: build $(OBJECTS) unittest $(APP_DIR)/$(TARGET)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
@@ -60,7 +60,7 @@ $(SWIG_DIR)/%_wrap.cpp: $(INCLUDE_DIR)/%.h
 $(SWIG_DIR)/%_wrap.o: $(SWIG_DIR)/%_wrap.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
 
-$(SWIG_DIR)/_%.so: $(SWIG_DIR)/%_wrap.o $(OBJECTS)
+$(SWIG_DIR)/_%.so: $(OBJECTS) $(SWIG_DIR)/%_wrap.o 
 	$(CXX) $(CXXFLAGS) $(SWIG_CXX_SO_FLAGS) -g $^ -o $@ $(LDFLAGS)
 
 -include $(DEPENDENCIES)
@@ -72,7 +72,7 @@ $(UNITTEST): $(LOG_DIR)/test_%.py.out: $(TEST_DIR)/test_%.py $(SWIG_SO_MODULES)
 
 $(TEST_TARGETS): test_%: $(LOG_DIR)/test_%.py.out
 
-test: $(UNITTEST)
+unittest: $(UNITTEST)
 
 build:
 	@mkdir -p $(APP_DIR)

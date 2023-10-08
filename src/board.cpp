@@ -73,10 +73,16 @@ const Piece * Board::get(COORD coord) const{
     auto it = board_map.find(coord);
     if (it != board_map.end())
         return it->second;
+    // If out of bounds
+    if (is_out_of_bounds(coord))
+        throw out_of_range("Coordinate out of range");
     return BLANK_PIECE;
 }
 
 void Board::set(COORD coord, const Piece * piece){
+    // If out of bounds
+    if (is_out_of_bounds(coord))
+        throw out_of_range("Coordinate out of range");
     if (piece->type == BLANK)
         remove(coord);
     board_map[coord] = piece;
@@ -131,5 +137,8 @@ unsigned Board::size() const{
     return board_map.size();
 }
 
+bool Board::is_out_of_bounds(COORD coord){
+    return (coord[0] < 0 || coord[0] >= BOARD_WIDTH || coord[1] < 0 || coord[1] >= BOARD_HEIGHT);
+}
 
 const Piece * Board::BLANK_PIECE = new const Piece(NONE, BLANK);

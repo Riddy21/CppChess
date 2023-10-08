@@ -27,4 +27,29 @@ class TestRules(unittest.TestCase):
 
         # Opponent obstruct
         self.assertEqual(rules.detect_obstruction((0, 1), (7, 7), self.board), rules.OPPONENT)
-        
+
+    def test_get_pawn_moves(self):
+        board = Board('presets/can_enpass.txt')
+
+        # Capture
+        poss_moves = rules.get_pawn_moves((1, 3), board)
+        self.assertEqual(poss_moves, ((2, 2),))
+
+        # Invalid
+        with self.assertRaises(RuntimeError):
+            poss_moves = rules.get_pawn_moves((1, 4), board)
+
+        # 1 move up
+        board[0,3].num_moves = 3
+        poss_moves = rules.get_pawn_moves((0, 3), board)
+        self.assertEqual(poss_moves, ((0, 4),))
+
+        # 2 moves up
+        poss_moves = rules.get_pawn_moves((6, 6), board)
+        self.assertEqual(poss_moves, ((6, 5), (6, 4)))
+
+        # Enpassant
+        board[6,3].num_moves = 1
+        poss_moves = rules.get_pawn_moves((5, 3), board)
+        self.assertEqual(poss_moves, ((6, 2),))
+

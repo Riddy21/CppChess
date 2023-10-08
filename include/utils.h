@@ -10,3 +10,15 @@ struct ArrayHash {
         return seed;
     }
 };
+
+struct MoveHash {
+    size_t operator()(const std::array<std::array<unsigned int, 2>, 2>& arr) const {
+        size_t hash = 0;
+        for (const auto& subarr : arr) {
+            for (const auto& elem : subarr) {
+                hash ^= std::hash<unsigned int>()(elem) + 0x9e3779b9 + (hash << 6) + (hash >> 2);
+            }
+        }
+        return hash;
+    }
+};
