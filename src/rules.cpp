@@ -80,7 +80,49 @@ MOVESET Rules::get_pawn_moves(COORD source, Board * board){
         throw invalid_argument("Trying to get pawn moves on blank piece");
     }
 
-    // Adding enpassant moves
+    return poss_moves;
+}
+
+MOVESET Rules::get_enpassante_moves(COORD source, Board * board){
+    unsigned x = source[0];
+    unsigned y = source[1];
+    MOVESET poss_moves;
+    Rules::OBSTRUCT_TYPE obstruct;
+
+    COORD right = {x+1, y};
+    COORD left = {x-1, y};
+
+    if (y == 3 && board->get(source)->color == WHITE){
+        // Right enpassante
+        if (detect_obstruction(source, right, board) == OPPONENT)
+            // Check if the piece is a pawn and has only moved once
+            if (board->get(right)->type == PAWN && board->get(right)->num_moves == 1)
+                // Check if the enpassante move is obstructed
+                if (detect_obstruction(source, {x+1, y-1}, board) == OPEN)
+                    poss_moves.insert({x+1, y-1});
+        if (detect_obstruction(source, left, board) == OPPONENT)
+            //Check if the pieces is a pawn and has only moved once
+            if (board->get(left)->type == PAWN && board->get(left)->num_moves == 1)
+                // Check if the enpassante move is obstructed
+                if (detect_obstruction(source, {x-1, y-1}, board) == OPEN)
+                    poss_moves.insert({x-1, y-1});
+    } else if (y == 4 && board->get(source)->color == BLACK){
+        // Left enpassante
+        if (detect_obstruction(source, right, board) == OPPONENT)
+            // Check if the piece is a pawn and has only moved once
+            if (board->get(right)->type == PAWN && board->get(right)->num_moves == 1)
+                // Check if the enpassante move is obstructed
+                if (detect_obstruction(source, {x+1, y+1}, board) == OPEN)
+                    poss_moves.insert({x+1, y+1});
+        if (detect_obstruction(source, left, board) == OPPONENT)
+            //Check if the pieces is a pawn and has only moved once
+            if (board->get(left)->type == PAWN && board->get(left)->num_moves == 1)
+                // Check if the enpassante move is obstructed
+                if (detect_obstruction(source, {x-1, y+1}, board) == OPEN)
+                    poss_moves.insert({x-1, y+1});
+    } else {
+        throw invalid_argument("Trying to get enpassante moves on blank piece");
+    }
 
     return poss_moves;
 }

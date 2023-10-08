@@ -53,6 +53,16 @@ namespace Rules {
      */
     MOVESET get_pawn_moves(COORD source, Board * board);
 
+    /**
+     * @brief Get enpassante moves from the given board
+     * 
+     * @param source
+     * @param board
+     * @return MOVESET
+     * 
+     */
+    MOVESET get_enpassante_moves(COORD source, Board * board);
+
 };
 
 #endif

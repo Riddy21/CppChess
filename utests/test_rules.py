@@ -48,8 +48,14 @@ class TestRules(unittest.TestCase):
         poss_moves = rules.get_pawn_moves((6, 6), board)
         self.assertEqual(poss_moves, ((6, 5), (6, 4)))
 
+    def test_get_enpassante_moves(self):
+        board = Board('presets/can_enpass.txt')
+        # no enpassante
+        poss_moves = rules.get_enpassante_moves((5, 3), board)
+        self.assertEqual(poss_moves, ())
+
         # Enpassant
         board[6,3].num_moves = 1
-        poss_moves = rules.get_pawn_moves((5, 3), board)
+        poss_moves = rules.get_enpassante_moves((5, 3), board)
         self.assertEqual(poss_moves, ((6, 2),))
 
