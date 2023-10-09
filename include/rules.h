@@ -90,6 +90,25 @@ namespace Rules {
      * @return MOVESET
      */
     MOVESET get_right_castle_moves(COORD source, Board * board);
+
+    /**
+     * @brief  Get the diagonal moves from the given board
+     * 
+     * @param source
+     * @param board
+     * @param spread The number of squares to spread
+     * @return MOVESET
+     */
+    MOVESET get_diagonal_moves(COORD source, Board * board, unsigned spread=BOARD_WIDTH);
+    /**
+     * @brief Get orthogonal moves from the given board
+     * 
+     * @param source
+     * @param board
+     * @param spread The number of squares to spread
+     * @return MOVESET
+     */
+    MOVESET get_orthogonal_moves(COORD source, Board * board, unsigned spread=BOARD_WIDTH);
 };
 
 #endif

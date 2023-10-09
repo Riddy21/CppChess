@@ -233,3 +233,95 @@ MOVESET Rules::get_right_castle_moves(COORD coord, Board * board){
 
     return poss_moves;
 }
+
+MOVESET Rules::get_diagonal_moves(COORD coord, Board * board, unsigned spread){
+    unsigned x = coord[0];
+    unsigned y = coord[1];
+    MOVESET poss_moves;
+
+    Rules::OBSTRUCT_TYPE obstruct;
+
+    //Top left
+    for (unsigned i=1; i<=spread; i++){
+        obstruct = detect_obstruction(coord, {x-i, y-i}, board);
+        if (obstruct == OPEN || obstruct == OPPONENT)
+            poss_moves.insert({x-i, y-i});
+        if (obstruct != OPEN)
+            break;
+    }
+
+    //Top right
+    for (unsigned i=1; i<=spread; i++){
+        obstruct = detect_obstruction(coord, {x+i, y-i}, board);
+        if (obstruct == OPEN || obstruct == OPPONENT)
+            poss_moves.insert({x+i, y-i});
+        if (obstruct != OPEN)
+            break;
+    }
+
+    //Bottom left
+    for (unsigned i=1; i<=spread; i++){
+        obstruct = detect_obstruction(coord, {x-i, y+i}, board);
+        if (obstruct == OPEN || obstruct == OPPONENT)
+            poss_moves.insert({x-i, y+i});
+        if (obstruct != OPEN)
+            break;
+    }
+
+    //Bottom right
+    for (unsigned i=1; i<=spread; i++){
+        obstruct = detect_obstruction(coord, {x+i, y+i}, board);
+        if (obstruct == OPEN || obstruct == OPPONENT)
+            poss_moves.insert({x+i, y+i});
+        if (obstruct != OPEN)
+            break;
+    }
+
+    return poss_moves;
+}
+
+MOVESET Rules::get_orthogonal_moves(COORD coord, Board * board, unsigned spread){
+    unsigned x = coord[0];
+    unsigned y = coord[1];
+    MOVESET poss_moves;
+
+    Rules::OBSTRUCT_TYPE obstruct;
+
+    //Up
+    for (unsigned i=1; i<=spread; i++){
+        obstruct = detect_obstruction(coord, {x, y+i}, board);
+        if (obstruct == OPEN || obstruct == OPPONENT)
+            poss_moves.insert({x, y+i});
+        if (obstruct != OPEN)
+            break;
+    }
+
+    //Down
+    for (unsigned i=1; i<=spread; i++){
+        obstruct = detect_obstruction(coord, {x, y-i}, board);
+        if (obstruct == OPEN || obstruct == OPPONENT)
+            poss_moves.insert({x, y-i});
+        if (obstruct != OPEN)
+            break;
+    }
+
+    //Left
+    for (unsigned i=1; i<=spread; i++){
+        obstruct = detect_obstruction(coord, {x-i, y}, board);
+        if (obstruct == OPEN || obstruct == OPPONENT)
+            poss_moves.insert({x-i, y});
+        if (obstruct != OPEN)
+            break;
+    }
+
+    //Right
+    for (unsigned i=1; i<=spread; i++){
+        obstruct = detect_obstruction(coord, {x+i, y}, board);
+        if (obstruct == OPEN || obstruct == OPPONENT)
+            poss_moves.insert({x+i, y});
+        if (obstruct != OPEN)
+            break;
+    }
+
+    return poss_moves;
+}

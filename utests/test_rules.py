@@ -1,4 +1,5 @@
 import unittest
+import faulthandler
 
 import rules
 from board import Board
@@ -8,6 +9,7 @@ class TestRules(unittest.TestCase):
     For testing Rules object
     """
     def setUp(self):
+        faulthandler.enable()
         self.board = Board()
 
     def test_detect_obstruction(self):
@@ -73,3 +75,8 @@ class TestRules(unittest.TestCase):
         board = Board('presets/ready_to_castle.txt')
         poss_moves = rules.get_right_castle_moves((4, 7), board)
         self.assertEqual(poss_moves, ((6, 7),))
+
+    def test_get_diagonal_moves(self):
+        board = Board('presets/check_blocked.txt')
+        poss_moves = rules.get_diagonal_moves((7, 3), board)
+        self.assertEqual(set(poss_moves), {(6, 4), (5, 5), (4, 6), (3, 7), (6, 2)})
