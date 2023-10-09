@@ -25,6 +25,16 @@ namespace Rules {
         OUT_OF_BOUNDS,
     };
 
+    enum MOVE_TYPE{
+        MOVE,
+        CAPTURE,
+        LCASTLE,
+        RCASTLE,
+        ENPASSANTE,
+        PROMOTION,
+        INVALID,
+    };
+
     /**
      * @brief Detect if the coordinate is out of bounds
      * 
@@ -109,6 +119,27 @@ namespace Rules {
      * @return MOVESET
      */
     MOVESET get_orthogonal_moves(COORD source, Board * board, unsigned spread=BOARD_WIDTH);
+
+    /**
+     * @brief Get the movetype of the given move
+     * 
+     * @param source
+     * @param target
+     * @param board
+     * @return MOVETYPE
+     */
+    MOVE_TYPE get_move_type(COORD source, COORD target, Board * board);
+
+    /**
+     * @brief check if move is a pawn promotion
+     * 
+     * @param source
+     * @param target
+     * @param board
+     * @return true
+     * @return false
+     */
+    bool is_pawn_promo(COORD source, COORD target, Board * board);
 };
 
 #endif

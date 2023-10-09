@@ -76,8 +76,6 @@ MOVESET Rules::get_pawn_moves(COORD source, Board * board){
         obstruct = detect_obstruction(source, {x-1, y-1}, board);
         if (obstruct == OPPONENT)
             poss_moves.insert({x-1, y-1});
-    } else {
-        throw invalid_argument("Trying to get pawn moves on blank piece");
     }
 
     return poss_moves;
@@ -119,8 +117,6 @@ MOVESET Rules::get_enpassante_moves(COORD source, Board * board){
                 // Check if the enpassante move is obstructed
                 if (detect_obstruction(source, {x-1, y+1}, board) == OPEN)
                     poss_moves.insert({x-1, y+1});
-    } else {
-        throw invalid_argument("Trying to get enpassante moves on blank piece");
     }
 
     return poss_moves;
@@ -324,4 +320,51 @@ MOVESET Rules::get_orthogonal_moves(COORD coord, Board * board, unsigned spread)
     }
 
     return poss_moves;
+}
+
+bool Rules::is_pawn_promo(COORD source, COORD target, Board * board){
+    if (board->get(source)->type == PAWN){
+        if (board->get(source)->color == BLACK){
+            if (target[1] == BOARD_HEIGHT-1)
+                return true;
+        } else if (board->get(source)->color == WHITE){
+            if (target[1] == 0)
+                return true;
+        }
+    }
+    return false;
+}
+
+Rules::MOVE_TYPE Rules::get_move_type(COORD source, COORD target, Board * board){
+    // Check if move is valid
+    // In bounds
+    if (is_out_of_bounds(source) || is_out_of_bounds(target))
+        return INVALID;
+
+
+    OBSTRUCT_TYPE obstruction = detect_obstruction(source, target, board);
+    // check not capturing own piece
+    if (obstruction == SELF)
+        return INVALID;
+
+    // Check is castle
+    if (get_left_castle_moves(source, board).count(target))
+        return LCASTLE;
+    if (get_right_castle_moves(source, board).count(target))
+        return RCASTLE;
+
+    // Check is enpassante
+    if (get_enpassante_moves(source, board).count(target))
+        return ENPASSANTE;
+
+    // Check is promotion
+    if (is_pawn_promo(source, target, board))
+        return PROMOTION;
+
+    // Check is capture
+    if (obstruction == OPPONENT)
+        return CAPTURE;
+    if (obstruction == OPEN)
+        return MOVE;
+
 }

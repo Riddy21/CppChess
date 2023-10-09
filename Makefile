@@ -60,7 +60,7 @@ $(SWIG_DIR)/%_wrap.cpp: $(INCLUDE_DIR)/%.h
 $(SWIG_DIR)/%_wrap.o: $(SWIG_DIR)/%_wrap.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
 
-$(SWIG_DIR)/_%.so: $(OBJECTS) $(SWIG_DIR)/%_wrap.o 
+$(SWIG_DIR)/_%.so: $(OBJECTS) $(SWIG_OBJ_MODULES)
 	$(CXX) $(CXXFLAGS) $(SWIG_CXX_SO_FLAGS) -g $^ -o $@ $(LDFLAGS)
 
 -include $(DEPENDENCIES)

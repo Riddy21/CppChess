@@ -38,8 +38,8 @@ class TestRules(unittest.TestCase):
         self.assertEqual(poss_moves, ((2, 2),))
 
         # Invalid
-        with self.assertRaises(RuntimeError):
-            poss_moves = rules.get_pawn_moves((1, 4), board)
+        poss_moves = rules.get_pawn_moves((1, 4), board)
+        self.assertEqual(poss_moves, ())
 
         # 1 move up
         board[0,3].num_moves = 3
@@ -85,3 +85,33 @@ class TestRules(unittest.TestCase):
         board = Board('presets/check_blocked.txt')
         poss_moves = rules.get_orthogonal_moves((7, 3), board)
         self.assertEqual(set(poss_moves), {(6, 3), (5, 3), (4, 3), (3, 3), (2, 3), (1, 3), (0, 3), (7, 2), (7, 1), (7, 4), (7, 5)})
+
+    def test_is_pawn_promo(self):
+        board = Board('presets/ready_to_promo.txt')
+        self.assertTrue(rules.is_pawn_promo((0, 1), (0, 0), board))
+
+    def test_get_move_type(self):
+        # enpassante
+        board = Board('presets/can_enpass.txt')
+        board[6,3].num_moves = 1
+        move_type = rules.get_move_type((5, 3), (6, 2), board)
+        self.assertEqual(move_type, rules.ENPASSANTE)
+
+        board.set_board('presets/ready_to_castle.txt')
+        move_type = rules.get_move_type((4, 7), (2, 7), board)
+        self.assertEqual(move_type, rules.LCASTLE)
+
+        move_type = rules.get_move_type((4, 7), (6, 7), board)
+        self.assertEqual(move_type, rules.RCASTLE)
+
+        board.set_board('presets/ready_to_promo.txt')
+        move_type = rules.get_move_type((0, 1), (0, 0), board)
+        self.assertEqual(move_type, rules.PROMOTION)
+
+        board.set_board('presets/minimize_capture.txt')
+        move_type = rules.get_move_type((3, 7), (6, 4), board)
+        self.assertEqual(move_type, rules.CAPTURE)
+
+        move_type = rules.get_move_type((3, 7), (5, 5), board)
+        self.assertEqual(move_type, rules.MOVE)
+
