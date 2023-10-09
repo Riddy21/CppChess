@@ -80,3 +80,8 @@ class TestRules(unittest.TestCase):
         board = Board('presets/check_blocked.txt')
         poss_moves = rules.get_diagonal_moves((7, 3), board)
         self.assertEqual(set(poss_moves), {(6, 4), (5, 5), (4, 6), (3, 7), (6, 2)})
+
+    def test_get_orthogonal_moves(self):
+        board = Board('presets/check_blocked.txt')
+        poss_moves = rules.get_orthogonal_moves((7, 3), board)
+        self.assertEqual(set(poss_moves), {(6, 3), (5, 3), (4, 3), (3, 3), (2, 3), (1, 3), (0, 3), (7, 2), (7, 1), (7, 4), (7, 5)})
