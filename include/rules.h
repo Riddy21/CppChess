@@ -63,6 +63,33 @@ namespace Rules {
      */
     MOVESET get_enpassante_moves(COORD source, Board * board);
 
+    /**
+     * @brief Get knight moves from the given board
+     * 
+     * @param source
+     * @param board
+     * @return MOVESET
+     * 
+     */
+    MOVESET get_knight_moves(COORD source, Board * board);
+
+    /**
+     * @brief Get the left castle moves
+     * 
+     * @param source 
+     * @param board 
+     * @return MOVESET 
+     */
+    MOVESET get_left_castle_moves(COORD source, Board * board);
+
+    /**
+     * @brief Get the right castle moves
+     * 
+     * @param source
+     * @param board
+     * @return MOVESET
+     */
+    MOVESET get_right_castle_moves(COORD source, Board * board);
 };
 
 #endif

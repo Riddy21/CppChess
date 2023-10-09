@@ -87,7 +87,6 @@ MOVESET Rules::get_enpassante_moves(COORD source, Board * board){
     unsigned x = source[0];
     unsigned y = source[1];
     MOVESET poss_moves;
-    Rules::OBSTRUCT_TYPE obstruct;
 
     COORD right = {x+1, y};
     COORD left = {x-1, y};
@@ -123,6 +122,114 @@ MOVESET Rules::get_enpassante_moves(COORD source, Board * board){
     } else {
         throw invalid_argument("Trying to get enpassante moves on blank piece");
     }
+
+    return poss_moves;
+}
+
+MOVESET Rules::get_knight_moves(COORD source, Board * board){
+    unsigned x = source[0];
+    unsigned y = source[1];
+    MOVESET poss_moves;
+    Rules::OBSTRUCT_TYPE obstruct;
+
+    // Up
+    obstruct = detect_obstruction(source, {x+1, y+2}, board);
+    if (obstruct == OPEN || obstruct == OPPONENT)
+        poss_moves.insert({x+1, y+2});
+    obstruct = detect_obstruction(source, {x-1, y+2}, board);
+    if (obstruct == OPEN || obstruct == OPPONENT)
+        poss_moves.insert({x-1, y+2});
+
+    // Down
+    obstruct = detect_obstruction(source, {x+1, y-2}, board);
+    if (obstruct == OPEN || obstruct == OPPONENT)
+        poss_moves.insert({x+1, y-2});
+    obstruct = detect_obstruction(source, {x-1, y-2}, board);
+    if (obstruct == OPEN || obstruct == OPPONENT)
+        poss_moves.insert({x-1, y-2});
+
+    // Left
+    obstruct = detect_obstruction(source, {x-2, y+1}, board);
+    if (obstruct == OPEN || obstruct == OPPONENT)
+        poss_moves.insert({x-2, y+1});
+    obstruct = detect_obstruction(source, {x-2, y-1}, board);
+    if (obstruct == OPEN || obstruct == OPPONENT)
+        poss_moves.insert({x-2, y-1});
+
+    // Right
+    obstruct = detect_obstruction(source, {x+2, y+1}, board);
+    if (obstruct == OPEN || obstruct == OPPONENT)
+        poss_moves.insert({x+2, y+1});
+    obstruct = detect_obstruction(source, {x+2, y-1}, board);
+    if (obstruct == OPEN || obstruct == OPPONENT)
+        poss_moves.insert({x+2, y-1});
+
+    return poss_moves;
+}
+
+MOVESET Rules::get_left_castle_moves(COORD source, Board * board){
+    unsigned x = source[0];
+    unsigned y = source[1];
+    MOVESET poss_moves;
+    Rules::OBSTRUCT_TYPE obstruct;
+
+    // Check if it is a king
+    if (board->get(source)->type != KING)
+        return poss_moves;
+
+    // Check if the king has moved
+    if (board->get(source)->num_moves != 0)
+        return poss_moves;
+
+    // Check if the rook has moved
+    if (board->get({0, y})->num_moves != 0)
+        return poss_moves;
+
+    // Check if the spaces are obstructed
+    obstruct = detect_obstruction(source, {x-1, y}, board);
+    if (obstruct != OPEN)
+        return poss_moves;
+    obstruct = detect_obstruction(source, {x-2, y}, board);
+    if (obstruct != OPEN)
+        return poss_moves;
+    obstruct = detect_obstruction(source, {x-3, y}, board);
+    if (obstruct != OPEN)
+        return poss_moves;
+
+    // Add the move
+    poss_moves.insert({x-2, y});
+
+    return poss_moves;
+}
+
+MOVESET Rules::get_right_castle_moves(COORD coord, Board * board){
+    unsigned x = coord[0];
+    unsigned y = coord[1];
+    MOVESET poss_moves;
+    Rules::OBSTRUCT_TYPE obstruct;
+
+    // Check if it is a king
+    if (board->get(coord)->type != KING)
+        return poss_moves;
+
+    // Check if the king has moved
+    if (board->get(coord)->num_moves != 0)
+        return poss_moves;
+
+    // Check if the rook has moved
+    if (board->get({BOARD_WIDTH-1, y})->num_moves != 0)
+        return poss_moves;
+
+    // Check if the spaces are obstructed
+    obstruct = detect_obstruction(coord, {x+1, y}, board);
+    if (obstruct != OPEN)
+        return poss_moves;
+    obstruct = detect_obstruction(coord, {x+2, y}, board);
+    if (obstruct != OPEN)
+        return poss_moves;
+
+    // Add the move
+    poss_moves.insert({x+2, y});
 
     return poss_moves;
 }

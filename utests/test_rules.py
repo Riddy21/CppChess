@@ -46,7 +46,7 @@ class TestRules(unittest.TestCase):
 
         # 2 moves up
         poss_moves = rules.get_pawn_moves((6, 6), board)
-        self.assertEqual(poss_moves, ((6, 5), (6, 4)))
+        self.assertEqual(set(poss_moves), {(6, 5), (6, 4)})
 
     def test_get_enpassante_moves(self):
         board = Board('presets/can_enpass.txt')
@@ -59,3 +59,17 @@ class TestRules(unittest.TestCase):
         poss_moves = rules.get_enpassante_moves((5, 3), board)
         self.assertEqual(poss_moves, ((6, 2),))
 
+    def test_get_knight_moves(self):
+        board = Board('presets/default.txt')
+        poss_moves = rules.get_knight_moves((1, 0), board)
+        self.assertEqual(set(poss_moves), {(0, 2), (2, 2)})
+
+    def test_left_castle_moves(self):
+        board = Board('presets/ready_to_castle.txt')
+        poss_moves = rules.get_left_castle_moves((4, 7), board)
+        self.assertEqual(poss_moves, ((2, 7),))
+
+    def test_right_castle_moves(self):
+        board = Board('presets/ready_to_castle.txt')
+        poss_moves = rules.get_right_castle_moves((4, 7), board)
+        self.assertEqual(poss_moves, ((6, 7),))
