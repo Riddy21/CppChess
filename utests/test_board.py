@@ -20,6 +20,10 @@ class TestBoard(unittest.TestCase):
 
         file.close()
 
+    def test_set_invalid_board(self):
+        with self.assertRaises(RuntimeError):
+            board = Board('invalid_path')
+
     def test_copy_board(self):
         # Original
         board1 = Board('presets/check.txt')
@@ -46,11 +50,14 @@ class TestBoard(unittest.TestCase):
             self.assertIsInstance(value, Piece)
 
     def test_access_empty_piece(self):
-        board = Board('Presets/default.txt')
+        board = Board('presets/default.txt')
 
         # try calling an empty piece
         self.assertEqual(board[0, 3].type, BLANK)
         self.assertEqual(board[0, 3].color, NONE)
+
+    def test_board_size(self):
+        board = Board('presets/default.txt')
 
         # Try printing the length of board
         self.assertEqual(board.size(), 4*8)

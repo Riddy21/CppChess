@@ -16,6 +16,10 @@ void Board::set_board(char * filepath){
     this->board_map.clear();
     // Output string
     string output;
+
+    // Check if file exists
+    if (!filesystem::exists(filepath))
+        throw runtime_error("File: " + string(filepath) + " does not exist");
     // Open config file
     ifstream BoardFile(filepath);
     // Get each piece
