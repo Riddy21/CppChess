@@ -1,12 +1,103 @@
-#include "rules.h"
+#include "movesets.h"
 
 using namespace std;
 
-bool Rules::is_out_of_bounds(COORD coord){
+Movesets::MOVE_TYPE Movesets::get_move_type(COORD source, COORD target, Board * board){
+    // Check if move is valid
+    // In bounds
+    if (is_out_of_bounds(source) || is_out_of_bounds(target))
+        return INVALID;
+
+
+    OBSTRUCT_TYPE obstruction = detect_obstruction(source, target, board);
+    // check not capturing own piece
+    if (obstruction == SELF)
+        return INVALID;
+
+    // Check is castle
+    if (get_left_castle_moves(source, board).count(target))
+        return LCASTLE;
+    if (get_right_castle_moves(source, board).count(target))
+        return RCASTLE;
+
+    // Check is enpassante
+    if (get_enpassante_moves(source, board).count(target))
+        return ENPASSANTE;
+
+    // Check is promotion
+    if (is_pawn_promo(source, target, board))
+        return PROMOTION;
+
+    // Check is capture
+    if (obstruction == OPPONENT)
+        return CAPTURE;
+    if (obstruction == OPEN)
+        return MOVE;
+
+    return INVALID;
+
+}
+
+MOVESET Movesets::get_moves(COORD source, Board * board){
+    // Get the type of the piece
+    TYPE type = board->get(source)->type;
+    MOVESET poss_moves;
+    MOVESET add_moves;
+    // Get the moves
+    switch(type){
+        case PAWN:
+            poss_moves = get_pawn_moves(source, board);
+            add_moves = get_enpassante_moves(source, board);
+            poss_moves.insert(add_moves.begin(), add_moves.end());
+            break;
+        case KNIGHT:
+            poss_moves = get_knight_moves(source, board);
+            break;
+        case BISHOP:
+            poss_moves = get_diagonal_moves(source, board);
+            break;
+        case ROOK:
+            poss_moves = get_orthogonal_moves(source, board, BOARD_WIDTH);
+            break;
+        case QUEEN:
+            poss_moves = get_diagonal_moves(source, board, BOARD_WIDTH);
+            add_moves = get_orthogonal_moves(source, board, BOARD_WIDTH);
+            poss_moves.insert(add_moves.begin(), add_moves.end());
+            break;
+        case KING:
+            poss_moves = get_diagonal_moves(source, board, 1);
+            add_moves = get_orthogonal_moves(source, board, 1);
+            poss_moves.insert(add_moves.begin(), add_moves.end());
+            add_moves = get_left_castle_moves(source, board);
+            poss_moves.insert(add_moves.begin(), add_moves.end());
+            add_moves = get_right_castle_moves(source, board);
+            poss_moves.insert(add_moves.begin(), add_moves.end());
+            break;
+        default:
+            throw invalid_argument("Invalid piece type");
+    }
+
+    return poss_moves;
+}
+
+bool Movesets::is_pawn_promo(COORD source, COORD target, Board * board){
+    if (board->get(source)->type == PAWN){
+        if (board->get(source)->color == BLACK){
+            if (target[1] == BOARD_HEIGHT-1)
+                return true;
+        } else if (board->get(source)->color == WHITE){
+            if (target[1] == 0)
+                return true;
+        }
+    }
+    return false;
+}
+
+bool Movesets::is_out_of_bounds(COORD coord){
     return (coord[0] < 0 || coord[0] >= BOARD_WIDTH || coord[1] < 0 || coord[1] >= BOARD_HEIGHT);
 }
 
-Rules::OBSTRUCT_TYPE Rules::detect_obstruction(COORD source, COORD target, Board * board){
+Movesets::OBSTRUCT_TYPE Movesets::detect_obstruction(COORD source, COORD target, Board * board){
     if (is_out_of_bounds(target) || is_out_of_bounds(source))
         return OUT_OF_BOUNDS;
 
@@ -24,11 +115,11 @@ Rules::OBSTRUCT_TYPE Rules::detect_obstruction(COORD source, COORD target, Board
     throw invalid_argument("Source cannot equal target");
 }
 
-MOVESET Rules::get_pawn_moves(COORD source, Board * board){
+MOVESET Movesets::get_pawn_moves(COORD source, Board * board){
     unsigned x = source[0];
     unsigned y = source[1];
     MOVESET poss_moves;
-    Rules::OBSTRUCT_TYPE obstruct;
+    Movesets::OBSTRUCT_TYPE obstruct;
 
     if (board->get(source)->color == BLACK){
         unsigned i = 1;
@@ -81,7 +172,7 @@ MOVESET Rules::get_pawn_moves(COORD source, Board * board){
     return poss_moves;
 }
 
-MOVESET Rules::get_enpassante_moves(COORD source, Board * board){
+MOVESET Movesets::get_enpassante_moves(COORD source, Board * board){
     unsigned x = source[0];
     unsigned y = source[1];
     MOVESET poss_moves;
@@ -122,11 +213,11 @@ MOVESET Rules::get_enpassante_moves(COORD source, Board * board){
     return poss_moves;
 }
 
-MOVESET Rules::get_knight_moves(COORD source, Board * board){
+MOVESET Movesets::get_knight_moves(COORD source, Board * board){
     unsigned x = source[0];
     unsigned y = source[1];
     MOVESET poss_moves;
-    Rules::OBSTRUCT_TYPE obstruct;
+    Movesets::OBSTRUCT_TYPE obstruct;
 
     // Up
     obstruct = detect_obstruction(source, {x+1, y+2}, board);
@@ -163,11 +254,11 @@ MOVESET Rules::get_knight_moves(COORD source, Board * board){
     return poss_moves;
 }
 
-MOVESET Rules::get_left_castle_moves(COORD source, Board * board){
+MOVESET Movesets::get_left_castle_moves(COORD source, Board * board){
     unsigned x = source[0];
     unsigned y = source[1];
     MOVESET poss_moves;
-    Rules::OBSTRUCT_TYPE obstruct;
+    Movesets::OBSTRUCT_TYPE obstruct;
 
     // Check if it is a king
     if (board->get(source)->type != KING)
@@ -198,11 +289,11 @@ MOVESET Rules::get_left_castle_moves(COORD source, Board * board){
     return poss_moves;
 }
 
-MOVESET Rules::get_right_castle_moves(COORD coord, Board * board){
+MOVESET Movesets::get_right_castle_moves(COORD coord, Board * board){
     unsigned x = coord[0];
     unsigned y = coord[1];
     MOVESET poss_moves;
-    Rules::OBSTRUCT_TYPE obstruct;
+    Movesets::OBSTRUCT_TYPE obstruct;
 
     // Check if it is a king
     if (board->get(coord)->type != KING)
@@ -230,12 +321,12 @@ MOVESET Rules::get_right_castle_moves(COORD coord, Board * board){
     return poss_moves;
 }
 
-MOVESET Rules::get_diagonal_moves(COORD coord, Board * board, unsigned spread){
+MOVESET Movesets::get_diagonal_moves(COORD coord, Board * board, unsigned spread){
     unsigned x = coord[0];
     unsigned y = coord[1];
     MOVESET poss_moves;
 
-    Rules::OBSTRUCT_TYPE obstruct;
+    Movesets::OBSTRUCT_TYPE obstruct;
 
     //Top left
     for (unsigned i=1; i<=spread; i++){
@@ -276,12 +367,12 @@ MOVESET Rules::get_diagonal_moves(COORD coord, Board * board, unsigned spread){
     return poss_moves;
 }
 
-MOVESET Rules::get_orthogonal_moves(COORD coord, Board * board, unsigned spread){
+MOVESET Movesets::get_orthogonal_moves(COORD coord, Board * board, unsigned spread){
     unsigned x = coord[0];
     unsigned y = coord[1];
     MOVESET poss_moves;
 
-    Rules::OBSTRUCT_TYPE obstruct;
+    Movesets::OBSTRUCT_TYPE obstruct;
 
     //Up
     for (unsigned i=1; i<=spread; i++){
@@ -320,51 +411,4 @@ MOVESET Rules::get_orthogonal_moves(COORD coord, Board * board, unsigned spread)
     }
 
     return poss_moves;
-}
-
-bool Rules::is_pawn_promo(COORD source, COORD target, Board * board){
-    if (board->get(source)->type == PAWN){
-        if (board->get(source)->color == BLACK){
-            if (target[1] == BOARD_HEIGHT-1)
-                return true;
-        } else if (board->get(source)->color == WHITE){
-            if (target[1] == 0)
-                return true;
-        }
-    }
-    return false;
-}
-
-Rules::MOVE_TYPE Rules::get_move_type(COORD source, COORD target, Board * board){
-    // Check if move is valid
-    // In bounds
-    if (is_out_of_bounds(source) || is_out_of_bounds(target))
-        return INVALID;
-
-
-    OBSTRUCT_TYPE obstruction = detect_obstruction(source, target, board);
-    // check not capturing own piece
-    if (obstruction == SELF)
-        return INVALID;
-
-    // Check is castle
-    if (get_left_castle_moves(source, board).count(target))
-        return LCASTLE;
-    if (get_right_castle_moves(source, board).count(target))
-        return RCASTLE;
-
-    // Check is enpassante
-    if (get_enpassante_moves(source, board).count(target))
-        return ENPASSANTE;
-
-    // Check is promotion
-    if (is_pawn_promo(source, target, board))
-        return PROMOTION;
-
-    // Check is capture
-    if (obstruction == OPPONENT)
-        return CAPTURE;
-    if (obstruction == OPEN)
-        return MOVE;
-
 }

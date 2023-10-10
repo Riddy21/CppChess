@@ -7,12 +7,9 @@
 
 %include <std_array.i>;
 %include <std_except.i>;
-%include <std_set.i>;
-%include <std_unordered_set.i>;
 
 %template(COORD) std::array<unsigned, 2>;
 %template(MOVE_COORDS) std::array<std::array<unsigned, 2>, 2>;
-%template(MOVESET) std::unordered_set<std::array<unsigned, 2>, ArrayHash>;
 
 %apply char { TYPE };
 
