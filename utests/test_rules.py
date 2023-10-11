@@ -11,6 +11,7 @@ class TestRules(unittest.TestCase):
 
     def test_get_king_coord(self):
         board = Board('presets/default.txt')
-        Rules.is_in_check(WHITE, board)
+        coord = Rules.is_in_check(WHITE, board)
+        self.assertEqual(coord, (4, 7))
 
 
