@@ -8,3 +8,9 @@ class TestRules(unittest.TestCase):
     """
     def setUp(self):
         faulthandler.enable()
+
+    def test_get_king_coord(self):
+        board = Board('presets/default.txt')
+        Rules.is_in_check(WHITE, board)
+
+

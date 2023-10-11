@@ -34,7 +34,7 @@ public:
      * @return true 
      * @return false 
      */
-    static bool is_in_check(Board * board, COLOR color);
+    static bool is_in_check(COLOR color, Board * board);
 
     /**
      * @brief Gets the state of the game currently
@@ -43,7 +43,7 @@ public:
      * @param color
      * @return GAME_STATE
      */
-    static GAME_STATE get_game_state(Board * board, COLOR color);
+    static GAME_STATE get_game_state(COLOR color, Board * board);
 
     /**
      * @brief Get moves given a source on the board, applies limitations from check
