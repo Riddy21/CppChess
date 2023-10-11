@@ -10,8 +10,26 @@ class TestRules(unittest.TestCase):
         faulthandler.enable()
 
     def test_get_king_coord(self):
-        board = Board('presets/default.txt')
+        board = Board('presets/checkmate.txt')
+        # White is in check
         coord = Rules.is_in_check(WHITE, board)
-        self.assertEqual(coord, (4, 7))
+        self.assertEqual(coord, True)
+        coord = Rules.is_in_check(BLACK, board)
+        self.assertEqual(coord, False)
+
+        board = Board('presets/default.txt')
+        # Neither in check
+        coord = Rules.is_in_check(WHITE, board)
+        self.assertEqual(coord, False)
+        coord = Rules.is_in_check(BLACK, board)
+        self.assertEqual(coord, False)
+
+        board = Board('presets/check.txt')
+        # Black is in check
+        coord = Rules.is_in_check(WHITE, board)
+        self.assertEqual(coord, False)
+        coord = Rules.is_in_check(BLACK, board)
+        self.assertEqual(coord, True)
+
 
 

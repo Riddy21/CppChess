@@ -46,7 +46,7 @@ UNITTEST := $(SWIG_MODULES:%=$(LOG_DIR)/test_%.py.out)
 DEPENDENCIES \
          := $(OBJECTS:.o=.d)
 
-all: build $(OBJECTS) unittest $(APP_DIR)/$(TARGET)
+all: build $(OBJECTS) $(SWIG_SO_MODULES) unittest $(APP_DIR)/$(TARGET)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
@@ -54,7 +54,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 $(APP_DIR)/$(TARGET): $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -o $(APP_DIR)/$(TARGET) $^ $(LDFLAGS)
 
-$(SWIG_DIR)/%_wrap.cpp: $(INCLUDE_DIR)/%.h
+$(SWIG_DIR)/%_wrap.cpp: $(INCLUDE_DIR)/%.h $(SRC_DIR)/%.cpp
 	$(SWIG) $(SWIGFLAGS) -o $@ -l $<
 
 $(SWIG_DIR)/%_wrap.o: $(SWIG_DIR)/%_wrap.cpp
@@ -63,12 +63,12 @@ $(SWIG_DIR)/%_wrap.o: $(SWIG_DIR)/%_wrap.cpp
 $(SWIG_DIR)/_%.so: $(OBJECTS) $(SWIG_DIR)/%_wrap.o
 	$(CXX) $(CXXFLAGS) $(SWIG_CXX_SO_FLAGS) -g $^ -o $@ $(LDFLAGS)
 
--include $(DEPENDENCIES)
-
-.PHONY: all build clean debug release info test $(TEST_TARGETS) $(UNITTEST)
-
 $(UNITTEST): $(LOG_DIR)/test_%.py.out: $(TEST_DIR)/test_%.py $(SWIG_SO_MODULES)
 	export PYTHONPATH=$(SWIG_DIR); python3 -m unittest $< 2>&1 | tee -a $@
+
+-include $(DEPENDENCIES)
+
+.PHONY: all build clean debug release info test $(TEST_TARGETS)
 
 $(TEST_TARGETS): test_%: $(LOG_DIR)/test_%.py.out
 
