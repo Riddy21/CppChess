@@ -19,6 +19,7 @@
 
 class Move {
 public:
+    ~Move();
     /**
      * @brief Makes a move from source to target and then returns the move object associated
      * 
@@ -27,7 +28,7 @@ public:
      * @param board 
      * @return Move* 
      */
-    static Move * make_move(COORD source, COORD target, Board * board);
+    static Move * make_move(COORD source, COORD target, Board * board, TYPE promotion_type = QUEEN);
 
     /**
      * @brief Undos the move on the board
@@ -58,7 +59,7 @@ private:
      * @param target
      * @param type
      */
-    Move(COORD source, COORD target, Movesets::MOVE_TYPE type);
+    Move(COORD source, COORD target, Movesets::MOVE_TYPE type, Piece * captured_piece);
 
 };
 

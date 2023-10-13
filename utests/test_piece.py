@@ -17,3 +17,12 @@ class TestPiece(unittest.TestCase):
         self.assertEqual(piece.num_moves, 0)
         self.assertEqual(piece.value, get_value(QUEEN))
         self.assertEqual(str(piece), 'q')
+
+    def test_val_dict_2(self):
+        piece = Piece(NONE, BLANK)
+
+        self.assertEqual(piece.type, BLANK)
+        self.assertEqual(piece.color, NONE)
+        self.assertEqual(piece.num_moves, 0)
+        self.assertEqual(piece.value, get_value(BLANK))
+        self.assertEqual(str(piece), '-')

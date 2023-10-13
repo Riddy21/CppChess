@@ -27,12 +27,16 @@ class TestBoard(unittest.TestCase):
     def test_copy_board(self):
         # Original
         board1 = Board('presets/check.txt')
+
+        board1[0, 0].num_moves = 1
+
         # Copy
         board2 = board1.copy()
 
         board1[1, 1] = board1[0,0]
 
         self.assertNotEqual(str(board1), str(board2))
+        self.assertEqual(board1[1, 1].num_moves, board2[0, 0].num_moves)
 
     def test_delete_piece(self):
         board = Board('presets/check.txt')
@@ -60,6 +64,7 @@ class TestBoard(unittest.TestCase):
         board = Board('presets/default.txt')
 
         # try calling an empty piece
+        self.assertEqual(str(board[0, 3]), '-')
         self.assertEqual(board[0, 3].type, BLANK)
         self.assertEqual(board[0, 3].color, NONE)
 

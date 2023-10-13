@@ -1,8 +1,7 @@
 import unittest
 import faulthandler
 
-from movesets import Movesets
-from board import Board
+from movesets import *
 
 class TestMovesets(unittest.TestCase):
     """
@@ -94,4 +93,10 @@ class TestMovesets(unittest.TestCase):
 
         move_type = Movesets.get_move_type((3, 7), (5, 5), board)
         self.assertEqual(move_type, Movesets.MOVE)
+
+    def test_get_valid_promo_types(self):
+        promo_types = Movesets.get_valid_promo_types()
+        valid_types = {QUEEN, ROOK, BISHOP, KNIGHT}
+        for type in promo_types:
+            self.assertIn(chr(type), valid_types)
 

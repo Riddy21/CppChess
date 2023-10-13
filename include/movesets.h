@@ -8,8 +8,10 @@
 %include "board.h"
 
 %include <std_unordered_set.i>;
+%include <std_vector.i>;
 
 %template(MOVESET) std::unordered_set<std::array<unsigned, 2>, ArrayHash>;
+%template(TYPE_VECTOR) std::vector<TYPE>;
 
 #endif
 #ifndef MOVESETS_H
@@ -52,6 +54,12 @@ public:
      * @return MOVESET
      */
     static MOVESET get_moves(COORD source, Board * board);
+
+    /**
+     * @brief Get all valid promotion types
+     * 
+     */
+    static std::vector<TYPE> get_valid_promo_types();
 
     /**
      * @brief check if move is a pawn promotion

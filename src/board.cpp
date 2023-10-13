@@ -2,12 +2,15 @@
 
 using namespace std;
 
-// FIXME: Use copies of the piece object
 Board::Board(char * filepath){
     this->set_board(filepath);
 }
 
 Board::~Board(){
+    // Delete the pieces
+    for (auto & [coord, piece] : board_map){
+        delete piece;
+    }
     // Deallocate the dict
     board_map.clear();
 }
@@ -45,7 +48,7 @@ void Board::set_board(char * filepath){
             piece_type = (TYPE)toupper(piece.c_str()[0]);
             // Try making the piece
             try{
-                const Piece * new_piece = new Piece(piece_color, piece_type);
+                Piece * new_piece = new Piece(piece_color, piece_type);
                 this->board_map[{col, row}] = new_piece;
             } catch (const exception& e){
                 throw runtime_error("Invalid Piece " + string(1, piece_type));
@@ -73,27 +76,43 @@ const char * Board::to_str() const{
     return c_str_out;
 }
 
-const Piece * Board::get(COORD coord) const{
-    auto it = board_map.find(coord);
-    if (it != board_map.end())
-        return it->second;
+const char * Board::to_num_moves() const{
+    string output = "";
+    for (unsigned y=0; y<BOARD_HEIGHT; y++){
+        for (unsigned x=0; x<BOARD_WIDTH; x++){
+            // Print the num moves as a string
+            output += to_string(get({x, y})->num_moves) + " ";
+        }
+        output.pop_back();
+        output += "\n";
+    }
+
+    char * c_str_out = new char[output.length()+1];
+    strcpy(c_str_out, output.c_str());
+    return c_str_out;
+}
+
+Piece * Board::get(COORD coord) const{
+    if (board_map.contains(coord))
+        return board_map.at(coord);
     // If out of bounds
     if (is_out_of_bounds(coord))
         throw out_of_range("Coordinate out of range");
+
     return BLANK_PIECE;
 }
 
-void Board::set(COORD coord, const Piece * piece){
+void Board::set(COORD coord, Piece * piece){
     // If out of bounds
     if (is_out_of_bounds(coord))
         throw out_of_range("Coordinate out of range");
     if (piece->type == BLANK)
         remove(coord);
-    board_map[coord] = piece;
+    board_map[coord] = piece->copy();
 }
 
-const vector<const Piece *> Board::pieces() const{
-    vector<const Piece *> pieces;
+const vector<Piece *> Board::pieces() const{
+    vector<Piece *> pieces;
     pieces.reserve(size());
 
     for (auto & [coord, piece] : board_map)
@@ -112,8 +131,8 @@ const vector<COORD> Board::coords() const{
     return coords;
 }
 
-const vector<pair<COORD, const Piece *>> Board::items() const{
-    vector<pair<COORD, const Piece *>> pairs;
+const vector<pair<COORD, Piece *>> Board::items() const{
+    vector<pair<COORD, Piece *>> pairs;
     pairs.reserve(size());
 
     for (auto & item : board_map)
@@ -132,7 +151,7 @@ Board * Board::copy() const{
     Board * new_board = new Board();
     // Set the board with all the current pieces
     for (auto & [coord, piece] : board_map)
-        new_board->set(coord, new Piece(piece->color, piece->type));
+        new_board->set(coord, piece);
 
     return new_board;
 }
@@ -145,4 +164,4 @@ bool Board::is_out_of_bounds(COORD coord){
     return (coord[0] < 0 || coord[0] >= BOARD_WIDTH || coord[1] < 0 || coord[1] >= BOARD_HEIGHT);
 }
 
-const Piece * Board::BLANK_PIECE = new const Piece(NONE, BLANK);
+Piece * Board::BLANK_PIECE = new Piece(NONE, BLANK);

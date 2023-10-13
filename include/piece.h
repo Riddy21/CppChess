@@ -19,8 +19,8 @@ using namespace std;
 class Piece {
 public:
     COLOR color;
-    unsigned num_moves = 0;
     TYPE type;
+    unsigned num_moves = 0;
     unsigned value;
     /**
      * @brief Construct a new Piece object
@@ -36,5 +36,7 @@ public:
      * @return const char* 
      */
     const char* __str__() const;
+
+    Piece * copy() const;
 };
 #endif

@@ -8,7 +8,6 @@ Movesets::MOVE_TYPE Movesets::get_move_type(COORD source, COORD target, Board * 
     if (is_out_of_bounds(source) || is_out_of_bounds(target))
         return INVALID;
 
-
     OBSTRUCT_TYPE obstruction = detect_obstruction(source, target, board);
     // check not capturing own piece
     if (obstruction == SELF)
@@ -35,7 +34,6 @@ Movesets::MOVE_TYPE Movesets::get_move_type(COORD source, COORD target, Board * 
         return MOVE;
 
     return INVALID;
-
 }
 
 MOVESET Movesets::get_moves(COORD source, Board * board){
@@ -78,6 +76,10 @@ MOVESET Movesets::get_moves(COORD source, Board * board){
     }
 
     return poss_moves;
+}
+
+std::vector<TYPE> Movesets::get_valid_promo_types(){
+    return {QUEEN, ROOK, BISHOP, KNIGHT};
 }
 
 bool Movesets::is_pawn_promo(COORD source, COORD target, Board * board){
