@@ -4,7 +4,7 @@ import faulthandler
 from movesets import Movesets
 from board import Board
 
-class TestMovesetss(unittest.TestCase):
+class TestMovesets(unittest.TestCase):
     """
     For testing Rules object
     """

@@ -9,7 +9,7 @@ class TestRules(unittest.TestCase):
     def setUp(self):
         faulthandler.enable()
 
-    def test_get_king_coord(self):
+    def test_is_in_check(self):
         board = Board('presets/checkmate.txt')
         # White is in check
         coord = Rules.is_in_check(WHITE, board)

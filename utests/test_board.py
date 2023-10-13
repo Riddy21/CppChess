@@ -34,6 +34,13 @@ class TestBoard(unittest.TestCase):
 
         self.assertNotEqual(str(board1), str(board2))
 
+    def test_delete_piece(self):
+        board = Board('presets/check.txt')
+        del board[0, 0]
+
+        self.assertEqual(board[0, 0].type, BLANK)
+        self.assertEqual(board[0, 0].color, NONE)
+
     def test_iterate_board(self):
         board = Board('presets/check.txt')
 

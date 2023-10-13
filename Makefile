@@ -34,19 +34,19 @@ INCLUDE  := -I $(INCLUDE_DIR) \
 SRC      :=                      \
    $(wildcard $(SRC_DIR)/*.cpp)
 
-SWIG_MODULES := piece board movesets rules
+SWIG_MODULES := piece board movesets rules move
 
 TEST_TARGETS := $(SWIG_MODULES:%=test_%)
 OBJECTS  := $(SRC:$(SRC_DIR)%.cpp=$(OBJ_DIR)/%.o)
 HEADERS  := $(SRC:$(SRC_DIR)%.cpp=$(INCLUDE_DIR)/%.h)
 SWIG_CPP_MODULES := $(SWIG_MODULES:%=$(SWIG_DIR)/%_wrap.cpp)
-SWIG_OBJ_MODULES := $(SWIG_MODULES:%=$(SWIG_DIR)/%_wrap.o)
+SWIG_OBJ_MODULES := $(SWIG_MODULES:%=$(OBJ_DIR)/%_wrap.o)
 SWIG_SO_MODULES := $(SWIG_MODULES:%=$(SWIG_DIR)/_%.so)
 UNITTEST := $(SWIG_MODULES:%=$(LOG_DIR)/test_%.py.out)
 DEPENDENCIES \
          := $(OBJECTS:.o=.d)
 
-all: build $(OBJECTS) $(SWIG_SO_MODULES) unittest $(APP_DIR)/$(TARGET)
+all: build $(OBJECTS) $(SWIG_OBJ_MODULES) unittest $(APP_DIR)/$(TARGET)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
@@ -54,23 +54,23 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 $(APP_DIR)/$(TARGET): $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -o $(APP_DIR)/$(TARGET) $^ $(LDFLAGS)
 
-$(SWIG_DIR)/%_wrap.cpp: $(INCLUDE_DIR)/%.h $(SRC_DIR)/%.cpp
+$(SWIG_DIR)/%_wrap.cpp: $(INCLUDE_DIR)/%.h
 	$(SWIG) $(SWIGFLAGS) -o $@ -l $<
 
-$(SWIG_DIR)/%_wrap.o: $(SWIG_DIR)/%_wrap.cpp
+$(OBJ_DIR)/%_wrap.o: $(SWIG_DIR)/%_wrap.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
 
-$(SWIG_DIR)/_%.so: $(OBJECTS) $(SWIG_DIR)/%_wrap.o
+$(SWIG_DIR)/_%.so: $(OBJECTS) $(OBJ_DIR)/%_wrap.o
 	$(CXX) $(CXXFLAGS) $(SWIG_CXX_SO_FLAGS) -g $^ -o $@ $(LDFLAGS)
-
-$(UNITTEST): $(LOG_DIR)/test_%.py.out: $(TEST_DIR)/test_%.py $(SWIG_SO_MODULES)
-	export PYTHONPATH=$(SWIG_DIR); python3 -m unittest $< 2>&1 | tee -a $@
 
 -include $(DEPENDENCIES)
 
-.PHONY: all build clean debug release info test $(TEST_TARGETS)
+.PHONY: all build clean debug release info test $(TEST_TARGETS) $(UNITTEST)
 
 $(TEST_TARGETS): test_%: $(LOG_DIR)/test_%.py.out
+
+$(UNITTEST): $(LOG_DIR)/test_%.py.out: $(TEST_DIR)/test_%.py $(SWIG_SO_MODULES)
+	export PYTHONPATH=$(SWIG_DIR); python3 -m unittest $< 2>&1 | tee $@
 
 unittest: $(UNITTEST)
 

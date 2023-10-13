@@ -2,6 +2,7 @@
 
 using namespace std;
 
+// FIXME: Use copies of the piece object
 Board::Board(char * filepath){
     this->set_board(filepath);
 }
@@ -16,7 +17,6 @@ void Board::set_board(char * filepath){
     this->board_map.clear();
     // Output string
     string output;
-
     // Check if file exists
     if (!filesystem::exists(filepath))
         throw runtime_error("File: " + string(filepath) + " does not exist");
@@ -125,16 +125,16 @@ const vector<pair<COORD, const Piece *>> Board::items() const{
 
 void Board::remove(COORD coord){
     if (board_map.contains(coord))
-        delete board_map[coord];
+        board_map.erase(coord);
 }
 
 Board * Board::copy() const{
     Board * new_board = new Board();
     // Set the board with all the current pieces
     for (auto & [coord, piece] : board_map)
-        new_board->set(coord, piece);
+        new_board->set(coord, new Piece(piece->color, piece->type));
 
-    return new Board();
+    return new_board;
 }
 
 unsigned Board::size() const{
