@@ -97,7 +97,7 @@ Piece * Board::get(COORD coord) const{
         return board_map.at(coord);
     // If out of bounds
     if (is_out_of_bounds(coord))
-        throw out_of_range("Coordinate out of range");
+        throw out_of_range("Coordinate out of range " + to_string(coord[0]) + ", " + to_string(coord[1]));
 
     return BLANK_PIECE;
 }
@@ -105,7 +105,7 @@ Piece * Board::get(COORD coord) const{
 void Board::set(COORD coord, Piece * piece){
     // If out of bounds
     if (is_out_of_bounds(coord))
-        throw out_of_range("Coordinate out of range");
+        throw out_of_range("Coordinate out of range " + to_string(coord[0]) + ", " + to_string(coord[1]));
     if (piece->type == BLANK)
         remove(coord);
     board_map[coord] = piece->copy();

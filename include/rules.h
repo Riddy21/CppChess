@@ -15,6 +15,7 @@
 
 #include "settings.h"
 #include "movesets.h"
+#include "move.h"
 #include "board.h"
 
 class Rules {
@@ -24,7 +25,6 @@ public:
         CHECK,
         CHECKMATE,
         STALEMATE,
-        PROMOTION,
     };
     /**
      * @brief Check if the king is in check
@@ -35,6 +35,16 @@ public:
      * @return false 
      */
     static bool is_in_check(COLOR color, Board * board);
+
+    /**
+     * @brief Check if the player can move
+     * 
+     * @param color
+     * @param board
+     * @return true
+     * @return false
+     */
+    static bool can_move(COLOR color, Board * board);
 
     /**
      * @brief Gets the state of the game currently
@@ -61,7 +71,8 @@ private:
      * @param poss_moves 
      * @param source 
      * @param board 
-     * @return MOVESET 
+     * 
+     * @return MOVESET
      */
     static MOVESET chk_limit_moves(COORD source, MOVESET poss_moves, Board * board);
 

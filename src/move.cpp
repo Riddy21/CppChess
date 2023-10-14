@@ -108,7 +108,20 @@ void Move::undo_move(Board * board) {
 }
 
 const char * Move::__str__() const {
+    string output = "";
 
+    output += "Type: " + to_string(type) + "\n";
+    // Get the source and target
+    output += "Source: " + to_string(source[0]) + ", " + to_string(source[1]) + "\n";
+    output += "Target: " + to_string(target[0]) + ", " + to_string(target[1]) + "\n";
+
+    // Get the captured piece
+    if (captured_piece != nullptr)
+        output += "Captured piece: " + string(1, *captured_piece->__str__()) + "\n";
+
+    char * c_str_out = new char[output.length()+1];
+    strcpy(c_str_out, output.c_str());
+    return c_str_out;
 }
 
 Move::Move(COORD source, COORD target, Movesets::MOVE_TYPE type, Piece * captured_piece) {

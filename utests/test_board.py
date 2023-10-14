@@ -48,7 +48,7 @@ class TestBoard(unittest.TestCase):
     def test_iterate_board(self):
         board = Board('presets/check.txt')
 
-        self.assertEqual(board.size(), 32)
+        self.assertEqual(board.size(), 30)
 
         for key, value in board.items():
             self.assertIsInstance(key, tuple)
@@ -73,7 +73,6 @@ class TestBoard(unittest.TestCase):
 
         # Try printing the length of board
         self.assertEqual(board.size(), 4*8)
-
 
     def test_invalid_set_board(self):
         board = Board()

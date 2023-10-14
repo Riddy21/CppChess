@@ -72,6 +72,18 @@ public:
      */
     static bool is_pawn_promo(COORD source, COORD target, Board * board);
 
+    /**
+     * @brief check if move is a castle
+     * 
+     * @param source
+     * @param target
+     * @param board
+     * @return true
+     * @return false
+     * 
+     */
+    static bool is_castle(COORD source, COORD target, Board * board);
+
 private:
     enum OBSTRUCT_TYPE{
         SELF,

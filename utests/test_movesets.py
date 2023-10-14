@@ -40,6 +40,12 @@ class TestMovesets(unittest.TestCase):
         board = Board('presets/ready_to_promo.txt')
         self.assertTrue(Movesets.is_pawn_promo((0, 1), (0, 0), board))
 
+    def test_is_castle(self):
+        board = Board('presets/ready_to_castle.txt')
+        self.assertTrue(Movesets.is_castle((4, 7), (2, 7), board))
+        self.assertTrue(Movesets.is_castle((4, 7), (6, 7), board))
+        self.assertFalse(Movesets.is_castle((4, 7), (5, 7), board))
+
     def test_get_knight_moves(self):
         board = Board('presets/default.txt')
         poss_moves = Movesets.get_moves((1, 0), board)
@@ -99,4 +105,3 @@ class TestMovesets(unittest.TestCase):
         valid_types = {QUEEN, ROOK, BISHOP, KNIGHT}
         for type in promo_types:
             self.assertIn(chr(type), valid_types)
-

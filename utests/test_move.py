@@ -194,7 +194,3 @@ class TestMove(unittest.TestCase):
         # Check the number of moves has been undone
         self.assertEqual(new_board[0, 0].num_moves, 0)
         self.assertEqual(new_board[0, 1].num_moves, 5)
-
-
-
-

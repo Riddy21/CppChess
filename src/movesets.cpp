@@ -95,6 +95,15 @@ bool Movesets::is_pawn_promo(COORD source, COORD target, Board * board){
     return false;
 }
 
+bool Movesets::is_castle(COORD source, COORD target, Board * board){
+    if (get_left_castle_moves(source, board).contains(target))
+        return true;
+    else if (get_right_castle_moves(source, board).contains(target))
+        return true;
+    else
+        return false;
+}
+
 bool Movesets::is_out_of_bounds(COORD coord){
     return (coord[0] < 0 || coord[0] >= BOARD_WIDTH || coord[1] < 0 || coord[1] >= BOARD_HEIGHT);
 }
