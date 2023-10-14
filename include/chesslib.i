@@ -1,5 +1,5 @@
 #ifdef SWIG
-%module chess
+%module chesslib
 %{
 #include "settings.h"
 #include "piece.h"

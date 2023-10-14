@@ -22,12 +22,18 @@ LDFLAGS  := -L/usr/lib -lstdc++ -lm
 BUILD    := ./build
 OBJ_DIR  := $(BUILD)/objects
 APP_DIR  := $(BUILD)/apps
-SWIG_DIR := $(BUILD)/swig
+LIB_DIR := $(BUILD)/lib
 LOG_DIR := $(BUILD)/log
+PY_DIR := pysrc
 INCLUDE_DIR := include
 SRC_DIR := src
 TEST_DIR := utests
-TARGET   := chess
+
+TARGET   := chesslib
+PY_TARGETS := \
+	$(wildcard $(PY_DIR)/*.py)
+TEST_TARGETS := $(patsubst $(TEST_DIR)/test_%.py, test_%, $(wildcard $(TEST_DIR)/*.py))
+
 INCLUDE  := -I $(INCLUDE_DIR) \
 			-I $(PYTHON_PACKAGE)
 
@@ -36,13 +42,13 @@ SRC      :=                      \
 
 OBJECTS  := $(SRC:$(SRC_DIR)%.cpp=$(OBJ_DIR)/%.o)
 HEADERS  := $(SRC:$(SRC_DIR)%.cpp=$(INCLUDE_DIR)/%.h)
-SWIG_LIB := $(SWIG_DIR)/_$(TARGET).so
-TEST_TARGETS := $(patsubst $(TEST_DIR)/test_%.py, test_%, $(wildcard $(TEST_DIR)/*.py))
+SWIG_LIB := $(LIB_DIR)/_$(TARGET).so
+PY_LIB   := $(PY_TARGETS:$(PY_DIR)/%.py=$(LIB_DIR)/%.py)
 
 DEPENDENCIES \
          := $(OBJECTS:.o=.d)
 
-all: build $(OBJECTS) $(SWIG_LIB) unittest
+all: build $(OBJECTS) $(SWIG_LIB) $(PY_LIB) unittest
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
@@ -50,32 +56,32 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 $(APP_DIR)/$(TARGET): $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -o $(APP_DIR)/$(TARGET) $^ $(LDFLAGS)
 
-$(SWIG_DIR)/%_wrap.cpp: $(INCLUDE_DIR)/%.i
+$(LIB_DIR)/%_wrap.cpp: $(INCLUDE_DIR)/%.i
 	$(SWIG) $(SWIGFLAGS) -o $@ -l $<
 
-$(OBJ_DIR)/%_wrap.o: $(SWIG_DIR)/%_wrap.cpp
+$(OBJ_DIR)/%_wrap.o: $(LIB_DIR)/%_wrap.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
 
-$(SWIG_LIB): $(SWIG_DIR)/_%.so: $(OBJECTS) $(OBJ_DIR)/%_wrap.o
+$(SWIG_LIB): $(LIB_DIR)/_%.so: $(OBJECTS) $(OBJ_DIR)/%_wrap.o
 	$(CXX) $(CXXFLAGS) $(SWIG_CXX_SO_FLAGS) -g $^ -o $@ $(LDFLAGS)
+
+$(PY_LIB): $(LIB_DIR)/%.py: $(PY_DIR)/%.py
+	cp $< $@
 
 -include $(DEPENDENCIES)
 
-.PHONY: all build clean debug release info test unittest $(TEST_TARGETS)
+.PHONY: all build clean debug release info unittest $(TEST_TARGETS)
 
-$(TEST_TARGETS): test_%: $(LOG_DIR)/test_%.py.out
+$(TEST_TARGETS): test_%: $(TEST_DIR)/test_%.py $(SWIG_LIB) $(PY_LIB)
+	export PYTHONPATH=$(LIB_DIR); python3 -m unittest $< 2>&1 | tee $(LOG_DIR)/$@.py.out
 
-$(LOG_DIR)/test_%.py.out: $(TEST_DIR)/test_%.py $(SWIG_SO_MODULES)
-	export PYTHONPATH=$(SWIG_DIR); python3 -m unittest $< 2>&1 | tee $@
-
-unittest: $(SWIG_LIB)
-	export PYTHONPATH=$(SWIG_DIR); python3 -m unittest discover -s $(TEST_DIR) -p "test_*.py" -v 2>&1 | tee $(LOG_DIR)/unittest.out
-
+unittest: $(SWIG_LIB) $(PY_LIB)
+	export PYTHONPATH=$(LIB_DIR); python3 -m unittest discover -s $(TEST_DIR) -p "test_*.py" -v 2>&1 | tee $(LOG_DIR)/$@.out
 
 build:
 	@mkdir -p $(APP_DIR)
 	@mkdir -p $(OBJ_DIR)
-	@mkdir -p $(SWIG_DIR)
+	@mkdir -p $(LIB_DIR)
 	@mkdir -p $(LOG_DIR)
 
 debug: CXXFLAGS += -DNDEBUG -g
@@ -87,7 +93,7 @@ release: all
 clean:
 	-@rm -rvf $(OBJ_DIR)/*
 	-@rm -rvf $(APP_DIR)/*
-	-@rm -rvf $(SWIG_DIR)/*
+	-@rm -rvf $(LIB_DIR)/*
 	-@rm -rvf $(LOG_DIR)/*
 
 info:
