@@ -1,5 +1,6 @@
 import unittest
 import faulthandler
+
 from piece import *
 
 class TestPiece(unittest.TestCase):

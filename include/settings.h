@@ -47,6 +47,7 @@
 #define DEFAULT_BOARD_PRESETS_PATH "Presets/default.txt"
 #define BOARD_HEIGHT 8
 #define BOARD_WIDTH 8
+#define NUM_PLAYERS 2
 
 typedef std::array<unsigned, 2> COORD;
 typedef std::array<COORD, 2> MOVE_COORDS;

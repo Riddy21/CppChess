@@ -1,5 +1,6 @@
 import unittest
 import faulthandler
+
 from rules import *
 
 class TestRules(unittest.TestCase):

@@ -6,6 +6,7 @@
 %}
 %include "settings.h"
 %include "movesets.h"
+%include "move.h"
 %include "board.h"
 
 #endif

@@ -1,5 +1,6 @@
 import unittest
 import faulthandler
+
 from board import *
 
 class TestBoard(unittest.TestCase):

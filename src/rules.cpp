@@ -26,7 +26,7 @@ bool Rules::can_move(COLOR color, Board * board) {
 
 Rules::GAME_STATE Rules::get_game_state(COLOR color, Board * board) {
     // if only 2 kings left on the board, stalemate
-    if (board->size() == 2)
+    if (board->size() == NUM_PLAYERS)
         return STALEMATE;
 
     // Check if the king is in check
