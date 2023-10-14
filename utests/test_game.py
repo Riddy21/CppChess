@@ -1,7 +1,7 @@
 import unittest
 import faulthandler
 
-from game import *
+from chess import *
 
 class TestGame(unittest.TestCase):
     """

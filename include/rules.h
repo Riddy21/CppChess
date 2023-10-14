@@ -5,7 +5,7 @@
 #include "rules.h"
 %}
 %include "settings.h"
-%include "movesets.h"
+%import  "movesets.h"
 %include "move.h"
 %include "board.h"
 

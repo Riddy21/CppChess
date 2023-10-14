@@ -34,19 +34,15 @@ INCLUDE  := -I $(INCLUDE_DIR) \
 SRC      :=                      \
    $(wildcard $(SRC_DIR)/*.cpp)
 
-SWIG_MODULES := piece board movesets rules move game
-
-TEST_TARGETS := $(SWIG_MODULES:%=test_%)
 OBJECTS  := $(SRC:$(SRC_DIR)%.cpp=$(OBJ_DIR)/%.o)
 HEADERS  := $(SRC:$(SRC_DIR)%.cpp=$(INCLUDE_DIR)/%.h)
-SWIG_CPP_MODULES := $(SWIG_MODULES:%=$(SWIG_DIR)/%_wrap.cpp)
-SWIG_OBJ_MODULES := $(SWIG_MODULES:%=$(OBJ_DIR)/%_wrap.o)
-SWIG_SO_MODULES := $(SWIG_MODULES:%=$(SWIG_DIR)/_%.so)
-UNITTEST := $(SWIG_MODULES:%=$(LOG_DIR)/test_%.py.out)
+SWIG_LIB := $(SWIG_DIR)/_$(TARGET).so
+TEST_TARGETS := $(patsubst $(TEST_DIR)/test_%.py, test_%, $(wildcard $(TEST_DIR)/*.py))
+
 DEPENDENCIES \
          := $(OBJECTS:.o=.d)
 
-all: build $(OBJECTS) $(SWIG_OBJ_MODULES) unittest $(APP_DIR)/$(TARGET)
+all: build $(OBJECTS) $(SWIG_LIB) unittest
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
@@ -54,25 +50,27 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 $(APP_DIR)/$(TARGET): $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -o $(APP_DIR)/$(TARGET) $^ $(LDFLAGS)
 
-$(SWIG_DIR)/%_wrap.cpp: $(INCLUDE_DIR)/%.h
+$(SWIG_DIR)/%_wrap.cpp: $(INCLUDE_DIR)/%.i
 	$(SWIG) $(SWIGFLAGS) -o $@ -l $<
 
 $(OBJ_DIR)/%_wrap.o: $(SWIG_DIR)/%_wrap.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
 
-$(SWIG_DIR)/_%.so: $(OBJECTS) $(OBJ_DIR)/%_wrap.o
+$(SWIG_LIB): $(SWIG_DIR)/_%.so: $(OBJECTS) $(OBJ_DIR)/%_wrap.o
 	$(CXX) $(CXXFLAGS) $(SWIG_CXX_SO_FLAGS) -g $^ -o $@ $(LDFLAGS)
 
 -include $(DEPENDENCIES)
 
-.PHONY: all build clean debug release info test $(TEST_TARGETS) $(UNITTEST)
+.PHONY: all build clean debug release info test unittest $(TEST_TARGETS)
 
 $(TEST_TARGETS): test_%: $(LOG_DIR)/test_%.py.out
 
-$(UNITTEST): $(LOG_DIR)/test_%.py.out: $(TEST_DIR)/test_%.py $(SWIG_SO_MODULES)
+$(LOG_DIR)/test_%.py.out: $(TEST_DIR)/test_%.py $(SWIG_SO_MODULES)
 	export PYTHONPATH=$(SWIG_DIR); python3 -m unittest $< 2>&1 | tee $@
 
-unittest: $(UNITTEST)
+unittest: $(SWIG_LIB)
+	export PYTHONPATH=$(SWIG_DIR); python3 -m unittest discover -s $(TEST_DIR) -p "test_*.py" -v 2>&1 | tee $(LOG_DIR)/unittest.out
+
 
 build:
 	@mkdir -p $(APP_DIR)

@@ -1,7 +1,7 @@
 import unittest
 import faulthandler
 
-from movesets import *
+from chess import *
 
 class TestMovesets(unittest.TestCase):
     """

@@ -1,7 +1,7 @@
 import unittest
 import faulthandler
 
-from move import *
+from chess import *
 
 class TestMove(unittest.TestCase):
     def setUp(self):
