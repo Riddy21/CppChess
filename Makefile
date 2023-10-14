@@ -27,12 +27,14 @@ LOG_DIR := $(BUILD)/log
 PY_DIR := pysrc
 INCLUDE_DIR := include
 SRC_DIR := src
-TEST_DIR := utests
+UTEST_DIR := utests
+SYSTEST_DIR :=systemtests
 
 TARGET   := chesslib
 PY_TARGETS := \
 	$(wildcard $(PY_DIR)/*.py)
-TEST_TARGETS := $(patsubst $(TEST_DIR)/test_%.py, test_%, $(wildcard $(TEST_DIR)/*.py))
+UTEST_TARGETS := $(patsubst $(UTEST_DIR)/test_%.py, test_%, $(wildcard $(UTEST_DIR)/*.py))
+SYSTEST_TARGETS := $(patsubst $(SYSTEST_DIR)/test_%.py, test_%, $(wildcard $(SYSTEST_DIR)/*.py))
 
 INCLUDE  := -I $(INCLUDE_DIR) \
 			-I $(PYTHON_PACKAGE)
@@ -48,7 +50,7 @@ PY_LIB   := $(PY_TARGETS:$(PY_DIR)/%.py=$(LIB_DIR)/%.py)
 DEPENDENCIES \
          := $(OBJECTS:.o=.d)
 
-all: build $(OBJECTS) $(SWIG_LIB) $(PY_LIB) unittest
+all: build $(OBJECTS) $(SWIG_LIB) $(PY_LIB) unittest systemtest
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
@@ -70,13 +72,19 @@ $(PY_LIB): $(LIB_DIR)/%.py: $(PY_DIR)/%.py
 
 -include $(DEPENDENCIES)
 
-.PHONY: all build clean debug release info unittest $(TEST_TARGETS)
+.PHONY: all build clean debug release info unittest $(UTEST_TARGETS) $(SYSTEST_TARGETS)
 
-$(TEST_TARGETS): test_%: $(TEST_DIR)/test_%.py $(SWIG_LIB) $(PY_LIB)
+$(UTEST_TARGETS): test_%: $(UTEST_DIR)/test_%.py $(SWIG_LIB) $(PY_LIB)
+	export PYTHONPATH=$(LIB_DIR); python3 -m unittest $< 2>&1 | tee $(LOG_DIR)/$@.py.out
+
+$(SYSTEST_TARGETS): test_%: $(SYSTEST_DIR)/test_%.py $(SWIG_LIB) $(PY_LIB)
 	export PYTHONPATH=$(LIB_DIR); python3 -m unittest $< 2>&1 | tee $(LOG_DIR)/$@.py.out
 
 unittest: $(SWIG_LIB) $(PY_LIB)
-	export PYTHONPATH=$(LIB_DIR); python3 -m unittest discover -s $(TEST_DIR) -p "test_*.py" -v 2>&1 | tee $(LOG_DIR)/$@.out
+	export PYTHONPATH=$(LIB_DIR); python3 -m unittest discover -s $(UTEST_DIR) -p "test_*.py" -v 2>&1 | tee $(LOG_DIR)/$@.out
+
+systemtest: $(SWIG_LIB) $(PY_LIB)
+	export PYTHONPATH=$(LIB_DIR); python3 -m unittest discover -s $(SYSTEST_DIR) -p "test_*.py" -v 2>&1 | tee $(LOG_DIR)/$@.out
 
 build:
 	@mkdir -p $(APP_DIR)
