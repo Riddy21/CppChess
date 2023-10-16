@@ -58,7 +58,7 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 $(APP_DIR)/$(TARGET): $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -o $(APP_DIR)/$(TARGET) $^ $(LDFLAGS)
 
-$(LIB_DIR)/%_wrap.cpp: $(INCLUDE_DIR)/%.i
+$(LIB_DIR)/%_wrap.cpp: $(INCLUDE_DIR)/%.i $(HEADERS) $(SRC)
 	$(SWIG) $(SWIGFLAGS) -o $@ -l $<
 
 $(OBJ_DIR)/%_wrap.o: $(LIB_DIR)/%_wrap.cpp
@@ -103,6 +103,7 @@ clean:
 	-@rm -rvf $(APP_DIR)/*
 	-@rm -rvf $(LIB_DIR)/*
 	-@rm -rvf $(LOG_DIR)/*
+	-@rm -rvf */__pycache__
 
 info:
 	@echo "[*] Application dir: ${APP_DIR}     "

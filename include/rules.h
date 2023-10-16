@@ -65,6 +65,15 @@ public:
      */
     static MOVESET get_moves(COORD source, Board * board);
 
+    /**
+     * @brief Get all the playable piece coordinates on the board
+     * 
+     * @param color
+     * @param board
+     * @return MOVESET
+     */
+    static MOVESET get_playable_piece_coords(COLOR color, Board * board);
+
 private:
     /**
      * @brief Remove the pieces from poss_moves that put you in check

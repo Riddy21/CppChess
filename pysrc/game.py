@@ -1,12 +1,9 @@
 from typing import Any
 import sys, os
-from pieces import *
-from move import Move
 from threading import Event, Lock
-from copy import deepcopy
-from board import BoardManager
-from settings import *
 import logging
+
+from chesslib import *
 
 class GameInternalError(Exception):
     """
@@ -23,30 +20,17 @@ class GameUserError(Exception):
 
 # Game class initiated when the game board is displayed
 class Game:
-    def __init__(self, turn=COLORS.WHITE, board=None, moves=None, captured_white=None, captured_black=None, prev_game_state='normal'):
-        if captured_black is None:
-            captured_black = []
-        if captured_white is None:
-            captured_white = []
-        if moves is None:
-            moves = []
-
-        # captured Pieces
-        self.captured_white = captured_white
-        self.captured_black = captured_black
-
+    def __init__(self, turn=WHITE, board=None):
         # stack of all old moves and current move
-        self.moves = moves
+        self.moves = []
 
-        # string representing the turn colour of the game
-        if type(turn) == str:
-            turn = COLORS.get_by_value(turn)
-
-        # TODO: Move turn to board object
         self.turn = turn
         self.switch_turn_event = Event()
 
-        self.game_state = prev_game_state
+        self.game_state = Rules.NORMAL
+
+        # For GUI, saves the selected coordinate
+        self.selected_coord = None
 
         # if board was not loaded by passing a parameter, set the board
         if not board:
@@ -55,15 +39,9 @@ class Game:
             self.board = board.copy()
 
 
-    @staticmethod
-    def get_board_from_config_file(config_file):
-        """Reads the config file and returns the board object"""
-        return BoardManager.get_board_from_file(config_file)
-
-
-    def set_board(self, config_file=DEFAULT_BOARD_PRESET_PATH):
-        # Create blank board
-        self.board = self.get_board_from_config_file(config_file)
+    def set_board(self, config_file=DEFAULT_BOARD_PRESETS_PATH):
+        # Create board from config file``
+        self.board = Board(config_file)
         self.update_game_state()
 
     def export_board(self, filename):
@@ -85,7 +63,7 @@ class Game:
 
     def set_turn(self, turn):
         """Sets turn to the color specified"""
-        if self.turn in (COLORS.WHITE, COLORS.BLACK):
+        if turn in (WHITE, BLACK):
             self.turn = turn
         else:
             raise GameUserError("Not a valid turn setting")
@@ -94,19 +72,25 @@ class Game:
 
     # switch turns without notifying players
     def switch_turn_quiet(self):
-        if self.turn == COLORS.WHITE:
-            self.turn = COLORS.BLACK
+        if self.turn == WHITE:
+            self.turn = BLACK
         else:
-            self.turn = COLORS.WHITE
+            self.turn = WHITE
 
         self.update_game_state()
 
     # Function to make complete move from to-coordinates and from-coordinates
-    def full_move(self, frox, froy, tox, toy):
-        if self.move_from(frox, froy) == -1:
-            return -1
-        if self.move_to(tox, toy) == -1:
-            return -1
+    def full_move(self, source, target):
+        # Check if the source is the right color
+        if self.board[source].color != self.turn:
+            raise GameUserError("Could not do move %s, %s" % (source, target))
+        # Check if it is a valid move
+        poss_moves = self.get_next_poss_moves(source)
+        if target not in poss_moves:
+            raise GameUserError("Could not do move %s, %s" % (source, target))
+        # Make the move and add it to the move list
+        self.moves.append(Move.make_move(source, target, self.board))
+        self.switch_turn()
 
     # Function to change pawn promotion piece
     def make_pawn_promo(self, promo_type):
@@ -124,96 +108,42 @@ class Game:
         for i in range(num):
             # undo move and delete move
             if len(self.moves) != 0:
-                # if in selection mode
-                if getattr(self.moves[-1], 'move_stage') == 'selected':
-                    # exit from selection mode
-                    self.moves[-1].deselect_move(self.board)
-                    del self.moves[-1]
-                else:
-                    self.moves[-1].undo_move(self.board)
-                    del self.moves[-1]
-                    self.switch_turn_quiet() # Make sure no players are alerted
+                move = self.moves.pop()
+                move.undo_move(self.board)
+                del move
+                self.switch_turn_quiet() # Make sure no players are alerted
         self.alert_players()
 
     # Function to check return what move stage we are at and handle move button
-    def handle_move(self, x, y):
-        # Check if moving from or moving to
-        if not self.moves or getattr(self.moves[-1], 'move_stage') == 'moved':
-            # If fresh board with no moves or move is finished move from this location
-            self.move_from(x, y)
+    def handle_move(self, coord):
+        # If we're selecting our own color
+        if self.board[coord].color == self.turn:
+            self.selected_coord = coord
         else:
-            # if the player selects a different piece to move
-            if self.board[x, y].color == self.turn:
-                # Removes move_id from piece and deletes move
-                self.moves[-1].deselect_move(self.board)
-                del self.moves[-1]
-                self.move_from(x, y)
-            # otherwise start a new move
-            else:
-                self.move_to(x, y)
-
-    # Function to start move
-    def move_from(self, x, y):
-        # DOn't allow move if pawn promotion is valid
-        if self.moves and self.moves[-1].pawn_promo == 'ready':
-            logging.debug("Invalid Selection, pawn promotion underway")
-            return -1
-        # Get possible moves
-        poss_moves = Move.get_poss_moves(self.board, self.turn, x, y)
-
-        # Check if it is a valid selection, if not, exit the function
-        if not poss_moves:
-            return -1
-
-        # Create a new move and add to list and pass the len of move list as move id
-        self.moves.append(Move(self.board, x, y, poss_moves))
+            try:
+                self.full_move(self.selected_coord, coord)
+            except GameUserError:
+                return
+            self.selected_coord = None
 
     # Function to return possible moves for the piece entered without making the move
-    def get_next_poss_moves(self, x, y):
-        poss_moves = Move.get_poss_moves(self.board, self.turn, x, y)
+    def get_next_poss_moves(self, source):
+        poss_moves = set(Rules.get_moves(source, self.board))
 
         return poss_moves
 
-
-    # Faster way to access current poss moves without recalculating all poss moves
     def get_current_poss_moves(self):
-        if self.moves:
-            return self.moves[-1].poss_moves
-        return ()
+        if self.selected_coord:
+            return self.get_next_poss_moves(self.selected_coord)
+        else:
+            return {}
 
     # get the coordinates of the pieces that are playable on that turn
     def get_playable_piece_coords(self):
-        playable = set()
-        for (x, y), square in self.board.items():
-            if square.piece.color == self.turn:
-                if self.get_next_poss_moves(x, y):
-                    playable.add((x, y))
-        return playable
-
-
-    # Function to end move,
-    def move_to(self, x, y):
-        # Makes move on the most recent move, if invalid move, don't switch sides
-        if self.moves[-1].make_move(self.board, x, y) == -1:
-            return -1
-
-        # Append captured pieces to the correct captured list
-        captured_piece = getattr(self.moves[-1], 'captured')
-        if captured_piece == None:
-            pass
-        elif captured_piece.color == COLORS.BLACK:
-            self.captured_black.append(captured_piece)
-        elif captured_piece.color == COLORS.WHITE:
-            self.captured_white.append(captured_piece)
-
-        # if the move results in pawn promotion don't switch turn
-        if self.moves[-1].pawn_promo == 'ready':
-            self.update_game_state()
-        else:
-            self.switch_turn()
+        return set(Rules.get_playable_piece_coords(self.turn, self.board))
 
     def update_game_state(self):
-        self.game_state = Rules.get_game_state(self.board)
+        self.game_state = Rules.get_game_state(self.turn, self.board)
 
     # Get the coordinates of that type of piece
     def get_piece_coords(self, piece_str):

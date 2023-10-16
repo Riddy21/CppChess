@@ -1,9 +1,6 @@
 from copy import deepcopy
-from move import Move
-from settings import *
-from rules import Rules
+from chesslib import *
 from predict import Predict
-import math
 import logging
 import random
 

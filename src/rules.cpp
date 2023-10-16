@@ -14,13 +14,20 @@ bool Rules::is_in_check(COLOR color, Board * board) {
 }
 
 bool Rules::can_move(COLOR color, Board * board) {
+    if (get_playable_piece_coords(color, board).empty())
+        return false;
+    return true;
+}
+
+MOVESET Rules::get_playable_piece_coords(COLOR color, Board * board) {
+    MOVESET playable_pieces;
     for (auto & [coord, piece] : board->items()){
         if (piece->color == color){
             if (!get_moves(coord, board).empty())
-                return true;
+                playable_pieces.insert(coord);
         }
     }
-    return false;
+    return playable_pieces;
 }
 
 
