@@ -80,7 +80,13 @@ class Game:
         self.update_game_state()
 
     # Function to make complete move from to-coordinates and from-coordinates
-    def full_move(self, source, target):
+    def full_move(self, source, target, promo=None):
+        valid_promo = Movesets.get_valid_promo_types()
+        # Check if move is pawn promo
+        if self.is_pawn_promo(source, target):
+            if promo is None or ord(promo) not in valid_promo:
+                raise GameUserError("Pawn promo not specified")
+
         # Check if the source is the right color
         if self.board[source].color != self.turn:
             raise GameUserError("Could not do move %s, %s" % (source, target))
@@ -89,8 +95,16 @@ class Game:
         if target not in poss_moves:
             raise GameUserError("Could not do move %s, %s" % (source, target))
         # Make the move and add it to the move list
-        self.moves.append(Move.make_move(source, target, self.board))
+        if promo is not None:
+            self.moves.append(Move.make_move(source, target, self.board, promo))
+        else:
+            self.moves.append(Move.make_move(source, target, self.board))
+
         self.switch_turn()
+
+    # Function to detect if the move is a pawn promo move
+    def is_pawn_promo(self, source, target):
+        return Movesets.is_pawn_promo(source, target, self.board)
 
     # Function to change pawn promotion piece
     def make_pawn_promo(self, promo_type):
@@ -149,17 +163,16 @@ class Game:
     def get_piece_coords(self, piece_str):
         coords = set()
         for (x, y), square in self.board.items():
-            if square.piece.str_rep == piece_str:
+            # upper case is white, lower case is black
+            color = WHITE if piece_str.isupper() else BLACK
+            type = piece_str.upper()
+            if square.type == type and square.color == color:
                 coords.add((x,y))
         return coords
 
     # Convert chess coords to int coords
     def get_chess_coords(self, col, row):
         return f"{chr(97+col)}{8-row}"
-
-    # Static: Converts Object board to string board
-    def get_chess_board_string_array(self):
-        return [[self.board[x, y].piece.str_rep for x in range(8)] for y in range(8)]
 
     # TODO: Static: Converts String board to Object board
 
@@ -175,18 +188,7 @@ class Game:
         # Add board string reps
         for y in range(len(self.board[0])):
             for x in range(len(self.board)):
-                string += str(self.board[x][y].move_count) + ' '
-            string += '\n'
-
-        print(string)
-
-    def print_move_hist(self):
-        string = ''
-
-        # Add board string reps
-        for y in range(len(self.board[0])):
-            for x in range(len(self.board)):
-                string += str(len(self.board[x][y].move_num_history)) + ' '
+                string += str(self.board[x][y].num_moves) + ' '
             string += '\n'
 
         print(string)
@@ -199,5 +201,8 @@ class Game:
     def quit(self):
         """Exits the game"""
         self.alert_players()
+        del self.board
+        for move in self.moves:
+            del move
         del self
         return

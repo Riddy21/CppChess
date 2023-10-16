@@ -72,7 +72,7 @@ MOVESET Movesets::get_moves(COORD source, Board * board){
             poss_moves.insert(add_moves.begin(), add_moves.end());
             break;
         default:
-            throw invalid_argument("Invalid piece type");
+            throw invalid_argument("Invalid piece type at " + to_string(source[0]) + ", " + to_string(source[1]) + "\n");
     }
 
     return poss_moves;

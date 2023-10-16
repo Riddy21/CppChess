@@ -81,22 +81,20 @@ class TestGame(unittest.TestCase):
         self.assertEqual(self.game.board[6, 2].type, PAWN)
         self.assertEqual(self.game.board[6, 2].color, BLACK)
 
-    @unittest.expectedFailure
     def test_make_pawn_promo(self):
         # Set the board to check
         self.game.set_board('presets/ready_to_promo.txt')
 
         # Try making a move on both sides
         with self.assertRaises(GameUserError):
-            self.game.full_move(6, 1, 6, 2)
-        self.assertEqual(None, self.game.full_move(0, 1, 0, 0))
-
-        self.assertEqual(COLORS.WHITE, self.game.turn)
+            self.game.full_move((6, 1), (6, 2))
+        with self.assertRaises(GameUserError):
+            self.game.full_move((0, 1), (0, 0))
 
         # Make promotion
-        self.game.make_pawn_promo(PIECES.QUEEN)
+        self.game.full_move((0, 1), (0, 0), QUEEN)
 
-        self.assertEqual(COLORS.BLACK, self.game.turn)
+        self.assertEqual(BLACK, self.game.turn)
 
     def test_castle_into_check(self):
         self.game.set_board('presets/castle_into_check.txt')
@@ -237,44 +235,44 @@ class TestGame(unittest.TestCase):
 
     def test_do_not_castle(self):
         self.game.set_board('presets/ready_to_castle.txt')
-        golden = self.game.get_board_from_config_file("presets/ready_to_castle.txt")
+        golden = Board("presets/ready_to_castle.txt")
 
         # Do regular king move
-        self.game.full_move(4, 7, 5, 7)
+        self.game.full_move((4, 7), (5, 7))
 
         # undo it and see if it's messed up
         self.game.undo_move()
 
-        self.compare_boards(self.game.board, golden)
+        self.assertEqual(str(self.game.board), str(golden))
 
     def test_enpassante(self):
         self.game.set_board('presets/ready_to_enpass.txt')
-        self.game.set_turn(COLORS.BLACK)
+        self.game.set_turn(BLACK)
 
         # Do pawn enpass
-        self.game.full_move(4, 1, 4, 3)
-        self.game.full_move(5, 3, 4, 2)
+        self.game.full_move((4, 1), (4, 3))
+        self.game.full_move((5, 3), (4, 2))
 
-        done_enpass = self.game.get_board_from_config_file("presets/done_enpass.txt")
+        done_enpass = Board("presets/done_enpass.txt")
 
         # make sure enpass is done
-        self.compare_boards(self.game.board, done_enpass)
+        self.assertEqual(str(self.game.board), str(done_enpass))
 
         # Try enpass again after undoing
         self.game.undo_move()
 
-        moves = self.game.get_next_poss_moves(5, 3)
+        moves = self.game.get_next_poss_moves((5, 3))
         self.assertEqual(moves, {(4, 2)})
 
         self.game.undo_move()
 
         #Try cancel move possibilities and then try again
-        self.game.full_move(4, 1, 4, 2)
-        self.game.full_move(7, 6, 7, 5)
-        self.game.full_move(4, 2, 4, 3)
+        self.game.full_move((4, 1), (4, 2))
+        self.game.full_move((7, 6), (7, 5))
+        self.game.full_move((4, 2), (4, 3))
 
         ## Try enpass
-        moves = self.game.get_next_poss_moves(5, 3)
+        moves = self.game.get_next_poss_moves((5, 3))
         self.assertEqual(moves, set())
 
 

@@ -5,7 +5,7 @@ using namespace std;
 bool Rules::is_in_check(COLOR color, Board * board) {
     COORD king_coord = get_king_coord(color, board);
     for (auto & [coord, piece] : board->items()){
-        if (piece->color != color){
+        if (piece->color != NONE && piece->color != color){
             if (Movesets::get_moves(coord, board).contains(king_coord))
                 return true;
         }
