@@ -2,12 +2,10 @@ import pygame
 import popup
 from player import *
 from utils import run_in_thread
-from settings import *
+from chesslib import *
 import logging
 
 # Set up the colors
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
 TAN = (236, 235, 205)
 GREEN = (104, 139, 80)
 GREY = (200, 200, 200)
@@ -37,18 +35,18 @@ class ChessboardGUI:
         self.SQUARE_SIZE = self.WIDTH // BOARD_WIDTH
 
         self.piece_images = {
-                "r": pygame.image.load("./Assets/Chess_tile_rd.png"),
-                "n": pygame.image.load("./Assets/Chess_tile_nd.png"),
-                "b": pygame.image.load("./Assets/Chess_tile_bd.png"),
-                "q": pygame.image.load("./Assets/Chess_tile_qd.png"),
-                "k": pygame.image.load("./Assets/Chess_tile_kd.png"),
-                "p": pygame.image.load("./Assets/Chess_tile_pd.png"),
-                "R": pygame.image.load("./Assets/Chess_tile_rl.png"),
-                "N": pygame.image.load("./Assets/Chess_tile_nl.png"),
-                "Q": pygame.image.load("./Assets/Chess_tile_ql.png"),
-                "B": pygame.image.load("./Assets/Chess_tile_bl.png"),
-                "K": pygame.image.load("./Assets/Chess_tile_kl.png"),
-                "P": pygame.image.load("./Assets/Chess_tile_pl.png"),
+                (ROOK, BLACK): pygame.image.load("./assets/Chess_tile_rd.png"),
+                (KNIGHT, BLACK): pygame.image.load("./assets/Chess_tile_nd.png"),
+                (BISHOP, BLACK): pygame.image.load("./assets/Chess_tile_bd.png"),
+                (QUEEN, BLACK): pygame.image.load("./assets/Chess_tile_qd.png"),
+                (KING, BLACK): pygame.image.load("./assets/Chess_tile_kd.png"),
+                (PAWN, BLACK): pygame.image.load("./assets/Chess_tile_pd.png"),
+                (ROOK, WHITE): pygame.image.load("./assets/Chess_tile_rl.png"),
+                (KNIGHT, WHITE): pygame.image.load("./assets/Chess_tile_nl.png"),
+                (BISHOP, WHITE): pygame.image.load("./assets/Chess_tile_bl.png"),
+                (QUEEN, WHITE): pygame.image.load("./assets/Chess_tile_ql.png"),
+                (KING, WHITE): pygame.image.load("./assets/Chess_tile_kl.png"),
+                (PAWN, WHITE): pygame.image.load("./assets/Chess_tile_pl.png"),
                 }
 
     def draw_board(self):
@@ -69,13 +67,13 @@ class ChessboardGUI:
             self.draw_dot(col, row)
 
     # Draws the highligh on the king that is in check
-    def draw_check_highlight(self, game_state):
-        if 'check' not in game_state:
+    def draw_check_highlight(self, turn, game_state):
+        if game_state != Rules.CHECK:
             return
 
-        if 'black' in game_state:
+        if BLACK == turn:
             coords = self.api.get_piece_coords('k')
-        elif 'white' in game_state:
+        elif WHITE == turn:
             coords = self.api.get_piece_coords('K')
         if len(coords) != 1:
             logging.error('more than one king')
@@ -86,13 +84,10 @@ class ChessboardGUI:
 
     # draw the pieces from the game object
     def draw_pieces(self, board):
-        # Get the current chessboard state from the API
-        chessboard_state = self.api.get_chess_board_string_array()
-
         # Draw the chess pieces
         for row in range(BOARD_HEIGHT):
             for col in range(BOARD_WIDTH):
-                piece = chessboard_state[row][col]
+                piece = (board[col, row].type, board[col, row].color)
                 self.draw_piece(piece, col, row)
 
     # Draw highlight on piece
@@ -131,19 +126,13 @@ class ChessboardGUI:
         #self.api.make_move(position)
 
     def prompt_mate_quit(self, game_state):
-        if game_state == 'black checkmate' and self.api.turn == COLORS.BLACK:
+        if game_state == Rules.CHECKMATE and self.api.turn == BLACK:
             ans = popup.askyesno(title="Checkmate!",
-                                 message="Checkmate! %s wins!\nWould you like to quit?" % self.get_prev_player().color.value)
-        elif game_state == 'white checkmate' and self.api.turn == COLORS.WHITE:
+                                 message="Checkmate! White wins!\nWould you like to quit?")
+        elif game_state == Rules.CHECKMATE and self.api.turn == WHITE:
             ans = popup.askyesno(title="Checkmate!",
-                                 message="Checkmate! %s wins!\nWould you like to quit?" % self.get_prev_player().color.value)
-        elif game_state == 'black stalemate' and self.api.turn == COLORS.BLACK:
-            ans = popup.askyesno(title="Stalemate!",
-                                 message="Stalemate!\nWould you like to quit?")
-        elif game_state == 'white stalemate' and self.api.turn == COLORS.WHITE:
-            ans = popup.askyesno(title="Stalemate!",
-                                 message="Stalemate!\nWould you like to quit?")
-        elif game_state == 'stalemate':
+                                 message="Checkmate! Black wins!\nWould you like to quit?")
+        elif game_state == Rules.STALEMATE:
             ans = popup.askyesno(title="Stalemate!",
                                  message="Stalemate!\nWould you like to quit?")
         else:
@@ -166,11 +155,11 @@ class ChessboardGUI:
         else:
             return self.p1
 
-    def prompt_promo(self, game_state):
+    def prompt_promo(self):
         # If it's the AI's turn and it is the COMPUTER
         if self.get_current_player().type == Player.COMPUTER:
             return
-        if 'promo' in game_state:
+        if self.api.is_pawn_promo():
             ans = popup.askchoice(title="Promotion",
                                   message="Choose Piece",
                                   options=['Queen', 'Rook', 'Knight', 'Bishop'],
@@ -179,21 +168,27 @@ class ChessboardGUI:
 
 
     def orient(self, coords):
+        # Don't flip if comp vs comp
         if self.get_current_player().type == Player.COMPUTER and\
                 self.get_prev_player().type == Player.COMPUTER:
             return coords
 
+        # don't flip if computer is black
         if self.get_current_player().type == Player.COMPUTER and\
-                self.api.turn == COLORS.BLACK:
+                self.api.turn == BLACK:
             return coords
 
+        # flip if computer is white
         if self.get_current_player().type == Player.COMPUTER and\
-                self.api.turn == COLORS.WHITE:
+                self.api.turn == WHITE:
             return 7-coords[0], 7-coords[1]
         
-        if self.api.turn == COLORS.WHITE:
+        # Alternate turns
+        if self.api.turn == WHITE:
             return coords
-        elif self.api.turn == COLORS.BLACK:
+        
+        # alternate turns
+        if self.api.turn == BLACK:
             return 7-coords[0], 7-coords[1]
 
     def run(self):
@@ -239,10 +234,10 @@ class ChessboardGUI:
                 self.draw_board()
 
                 # If in check, draw the error highlights
-                self.draw_check_highlight(self.api.game_state)
+                self.draw_check_highlight(self.api.turn, self.api.game_state)
 
                 # Draw the pieces
-                self.draw_pieces(self.api.get_chess_board_string_array())
+                self.draw_pieces(self.api.board)
 
                 # Draw markers for next moves
                 self.draw_poss_moves(self.api.get_current_poss_moves())
@@ -254,7 +249,8 @@ class ChessboardGUI:
                     if self.prompt_mate_quit(self.api.game_state):
                         running = False
 
-                    self.prompt_promo(self.api.game_state)
+                    # FIXME: Fix prompt promo
+                    #self.prompt_promo()
 
                 # Have AI do move if ai is enabled
                 #if self.get_current_player().type == Player.COMPUTER:

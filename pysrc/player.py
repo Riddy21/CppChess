@@ -2,8 +2,8 @@ from utils import *
 import threading
 import random
 from time import sleep
-from settings import *
 from search_tree import SearchTree
+from chesslib import *
 import logging
 
 # FIXME: Make a variable to tell if the thread failed
@@ -13,8 +13,6 @@ class Player:
     COMPUTER = 'computer'
     def __init__(self, game, color, player_type):
         self.game = game
-        if type(color) == str:
-            color = COLORS.get_by_value(color)
         self.color = color
         self.type = player_type
 
@@ -30,7 +28,7 @@ class Human(Player):
 
     @run_synchronously
     def handle_move(self, col, row):
-        self.game.handle_move(col, row)
+        self.game.handle_move((col, row))
 
 
 # Ai class that can analyse a game and take control of a specific color

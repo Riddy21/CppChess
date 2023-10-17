@@ -1,7 +1,6 @@
 import unittest
 from search_tree import SearchTree
 from game import Game
-from settings import *
 from timeit import default_timer as timer
 
 class TestSearchTree(unittest.TestCase):

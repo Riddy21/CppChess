@@ -1,5 +1,3 @@
-from settings import *
-from rules import Rules
 class Predict(object):
     @staticmethod
     def get_points(move, board, turn, poss_moves=None):
@@ -16,11 +14,11 @@ class Predict(object):
 
         # If captures a piece, add points
         elif move.move_type == 'capture' and move.move_colour == turn:
-            return move.captured.piece.value
+            return move.captured.value
 
         # If lose a piece, subtract points
         elif move.move_type == 'capture' and move.move_colour != turn:
-            return -move.captured.piece.value
+            return -move.captured.value
 
         else:
             # Else give 0 points

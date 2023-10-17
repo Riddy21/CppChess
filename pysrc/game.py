@@ -106,20 +106,10 @@ class Game:
     def is_pawn_promo(self, source, target):
         return Movesets.is_pawn_promo(source, target, self.board)
 
-    # Function to change pawn promotion piece
-    def make_pawn_promo(self, promo_type):
-        # if the pawn promotion goes through, switch turns
-        try:
-            if self.moves[-1].make_pawn_promo(promo_type, self.board) != -1:
-                self.switch_turn()
-            else:
-                raise GameUserError("Pawn promo failed")
-        except IndexError:
-            raise GameInternalError("There are no moves in the stack") from None
-
     # Function to undo a move and remove it from the move list
     def undo_move(self, num=1):
         for i in range(num):
+            self.selected_coord = None
             # undo move and delete move
             if len(self.moves) != 0:
                 move = self.moves.pop()
@@ -134,10 +124,11 @@ class Game:
         if self.board[coord].color == self.turn:
             self.selected_coord = coord
         else:
-            try:
-                self.full_move(self.selected_coord, coord)
-            except GameUserError:
-                return
+            if self.selected_coord:
+                try:
+                    self.full_move(self.selected_coord, coord)
+                except GameUserError:
+                    pass
             self.selected_coord = None
 
     # Function to return possible moves for the piece entered without making the move
