@@ -27,8 +27,8 @@ class Human(Player):
         super().__init__(game, color, Player.HUMAN)
 
     @run_synchronously
-    def handle_move(self, col, row):
-        self.game.handle_move((col, row))
+    def handle_move(self, col, row, promo=None):
+        self.game.handle_move((col, row), promo)
 
 
 # Ai class that can analyse a game and take control of a specific color

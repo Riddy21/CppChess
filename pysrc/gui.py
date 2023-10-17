@@ -122,8 +122,21 @@ class ChessboardGUI:
 
         # Call the API method to interact with the chessboard
         col, row = self.orient((col, row))
-        player.handle_move(col, row)
-        #self.api.make_move(position)
+
+        # If it is a pawn promo, pull up the UI to do it
+        promo = self.check_promo(pos)
+
+        player.handle_move(col, row, promo)
+
+    def check_promo(self, pos):
+        # If its not a valid move
+        if pos not in self.api.get_current_poss_moves():
+            return None
+
+        if self.api.is_pawn_promo(self.api.selected_coord, pos):
+            return self.prompt_promo()
+
+        return None
 
     def prompt_mate_quit(self, game_state):
         if game_state == Rules.CHECKMATE and self.api.turn == BLACK:
@@ -156,15 +169,16 @@ class ChessboardGUI:
             return self.p1
 
     def prompt_promo(self):
-        # If it's the AI's turn and it is the COMPUTER
-        if self.get_current_player().type == Player.COMPUTER:
-            return
-        if self.api.is_pawn_promo():
-            ans = popup.askchoice(title="Promotion",
-                                  message="Choose Piece",
-                                  options=['Queen', 'Rook', 'Knight', 'Bishop'],
-                                  default='Queen')
-            self.api.make_pawn_promo(PIECES.get_by_key('display_name', ans))
+        promo_dict = {'Queen' : QUEEN,
+                      'Rook'  : ROOK,
+                      'Knight': KNIGHT,
+                      'Bishop': BISHOP,
+                      }
+        ans = popup.askchoice(title="Promotion",
+                              message="Choose Piece",
+                              options=promo_dict.keys(),
+                              default='Queen')
+        return promo_dict[ans]
 
 
     def orient(self, coords):

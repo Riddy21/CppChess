@@ -104,7 +104,10 @@ class Game:
 
     # Function to detect if the move is a pawn promo move
     def is_pawn_promo(self, source, target):
-        return Movesets.is_pawn_promo(source, target, self.board)
+        if source and target:
+            return Movesets.is_pawn_promo(source, target, self.board)
+        else:
+            return False
 
     # Function to undo a move and remove it from the move list
     def undo_move(self, num=1):
@@ -120,14 +123,14 @@ class Game:
         self.alert_players()
 
     # Function to check return what move stage we are at and handle move button
-    def handle_move(self, coord):
+    def handle_move(self, coord, promo=None):
         # If we're selecting our own color
         if self.board[coord].color == self.turn:
             self.selected_coord = coord
         else:
             if self.selected_coord:
                 try:
-                    self.full_move(self.selected_coord, coord)
+                    self.full_move(self.selected_coord, coord, promo)
                 except GameUserError:
                     pass
             self.selected_coord = None
