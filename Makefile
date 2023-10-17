@@ -50,7 +50,7 @@ PY_LIB   := $(PY_TARGETS:$(PY_DIR)/%.py=$(LIB_DIR)/%.py)
 DEPENDENCIES \
          := $(OBJECTS:.o=.d)
 
-all: build $(OBJECTS) $(SWIG_LIB) $(PY_LIB) unittest systemtest
+all: build $(OBJECTS) $(SWIG_LIB) $(PY_LIB) unittest systemtest play
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
@@ -72,7 +72,7 @@ $(PY_LIB): $(LIB_DIR)/%.py: $(PY_DIR)/%.py
 
 -include $(DEPENDENCIES)
 
-.PHONY: all build clean debug release info unittest $(UTEST_TARGETS) $(SYSTEST_TARGETS)
+.PHONY: all build clean debug release info unittest $(UTEST_TARGETS) $(SYSTEST_TARGETS) play
 
 $(UTEST_TARGETS): test_%: $(UTEST_DIR)/test_%.py $(SWIG_LIB) $(PY_LIB)
 	export PYTHONPATH=$(LIB_DIR); python3 -m unittest $< 2>&1 | tee $(LOG_DIR)/$@.py.out
@@ -85,6 +85,9 @@ unittest: $(SWIG_LIB) $(PY_LIB)
 
 systemtest: $(SWIG_LIB) $(PY_LIB)
 	export PYTHONPATH=$(LIB_DIR); python3 -m unittest discover -s $(SYSTEST_DIR) -p "test_*.py" -v 2>&1 | tee $(LOG_DIR)/$@.out
+
+play: $(SWIG_LIB) $(PY_LIB)
+	export PYTHONPATH=$(LIB_DIR); python3 main.py
 
 build:
 	@mkdir -p $(APP_DIR)

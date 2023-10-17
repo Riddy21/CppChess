@@ -109,6 +109,7 @@ class Game:
     # Function to undo a move and remove it from the move list
     def undo_move(self, num=1):
         for i in range(num):
+            # Clear the selected coordinates
             self.selected_coord = None
             # undo move and delete move
             if len(self.moves) != 0:
