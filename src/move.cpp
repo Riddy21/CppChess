@@ -3,6 +3,7 @@
 Move::~Move() {
     // Delete the captured piece pointer
     delete captured_piece;
+    delete promo_piece;
 }
 
 Move * Move::make_move(COORD source, COORD target, Board * board, TYPE promotion_type) {
@@ -16,6 +17,7 @@ Move * Move::make_move(COORD source, COORD target, Board * board, TYPE promotion
 
     // Make the move
     Piece * captured = nullptr;
+    Piece * promo = nullptr;
     switch(move_type){
         case Movesets::MOVE:
             board->set(target, board->get(source));
@@ -36,10 +38,15 @@ Move * Move::make_move(COORD source, COORD target, Board * board, TYPE promotion
             board->get(target)->num_moves ++;
             break;
         case Movesets::PROMOTION:
-            captured = board->get(source); // Keep the previous pawn as captured piece
+            promo = board->get(source); // Keep the previous pawn as promo piece
+            // If the promotion was a capture, capture the piece
+            if (board->get(target)->type != BLANK){
+                captured = board->get(target);
+                board->remove(target);
+            }
             board->set(target, new Piece(board->get(source)->color, promotion_type)); // Set the new piece
             board->remove(source);
-            board->get(target)->num_moves = captured->num_moves + 1; // Set the number of moves to the number of moves of the pawn + 1
+            board->get(target)->num_moves = promo->num_moves + 1; // Set the number of moves to the number of moves of the pawn + 1
             break;
         case Movesets::LCASTLE:
             board->set(target, board->get(source));
@@ -60,7 +67,7 @@ Move * Move::make_move(COORD source, COORD target, Board * board, TYPE promotion
         default:
             throw invalid_argument("Move type " + to_string(move_type) + " not implemented");
     }
-    return new Move(source, target, move_type, captured);
+    return new Move(source, target, move_type, captured, promo);
 }
 
 void Move::undo_move(Board * board) {
@@ -82,9 +89,13 @@ void Move::undo_move(Board * board) {
             board->get(source)->num_moves --;
             break;
         case Movesets::PROMOTION:
-            board->set(source, captured_piece); // Set the pawn back
+            board->set(source, promo_piece); // Set the pawn back
             delete board->get(target); // Delete the promoted piece
             board->remove(target); // Remove the promoted piece
+
+            // if there was a captured piece, replace it
+            if (captured_piece != nullptr)
+                board->set(target, captured_piece);
             break;
         case Movesets::LCASTLE:
             board->set(source, board->get(target));
@@ -124,9 +135,10 @@ const char * Move::__str__() const {
     return c_str_out;
 }
 
-Move::Move(COORD source, COORD target, Movesets::MOVE_TYPE type, Piece * captured_piece) {
+Move::Move(COORD source, COORD target, Movesets::MOVE_TYPE type, Piece * captured_piece, Piece * promo_piece) {
     this->source = source;
     this->target = target;
     this->type = type;
     this->captured_piece = captured_piece;
+    this->promo_piece = promo_piece;
 }

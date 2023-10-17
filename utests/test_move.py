@@ -168,15 +168,17 @@ class TestMove(unittest.TestCase):
         board = Board("presets/ready_to_promo.txt")
         board[0, 1].num_moves = 5
         # Make the move that castles
-        move = Move.make_move((0, 1), (0, 0), board, KNIGHT)
+        move = Move.make_move((0, 1), (1, 0), board, KNIGHT)
         
         # Check the move has been made
-        self.assertEqual(board[0, 0].type, KNIGHT)
+        self.assertEqual(board[1, 0].type, KNIGHT)
         self.assertEqual(board[0, 1].type, BLANK)
 
         # Check that the num_moves has been recorded
-        self.assertEqual(board[0, 0].num_moves, 6)
+        self.assertEqual(board[1, 0].num_moves, 6)
         self.assertEqual(board[0, 1].num_moves, 0)
+
+        self.assertEqual(board[1, 0].color, WHITE)
 
         # Try undo the move on a different instance of board
         new_board = board.copy()
@@ -188,9 +190,11 @@ class TestMove(unittest.TestCase):
         del move
 
         # Check that the move has been undone
-        self.assertEqual(new_board[0, 0].type, BLANK)
+        self.assertEqual(new_board[1, 0].type, KNIGHT)
         self.assertEqual(new_board[0, 1].type, PAWN)
 
         # Check the number of moves has been undone
-        self.assertEqual(new_board[0, 0].num_moves, 0)
+        self.assertEqual(new_board[1, 0].num_moves, 0)
         self.assertEqual(new_board[0, 1].num_moves, 5)
+
+        self.assertEqual(new_board[1, 0].color, BLACK)

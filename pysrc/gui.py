@@ -176,7 +176,7 @@ class ChessboardGUI:
                       }
         ans = popup.askchoice(title="Promotion",
                               message="Choose Piece",
-                              options=promo_dict.keys(),
+                              options=list(promo_dict.keys()),
                               default='Queen')
         return promo_dict[ans]
 

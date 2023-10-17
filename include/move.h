@@ -51,6 +51,7 @@ private:
     COORD target;
     Movesets::MOVE_TYPE type;
     Piece * captured_piece;
+    Piece * promo_piece;
 
     /**
      * @brief Construct the move class, private contructor to be created by static methods
@@ -59,7 +60,7 @@ private:
      * @param target
      * @param type
      */
-    Move(COORD source, COORD target, Movesets::MOVE_TYPE type, Piece * captured_piece);
+    Move(COORD source, COORD target, Movesets::MOVE_TYPE type, Piece * captured_piece, Piece * promo_piece);
 
 };
 
