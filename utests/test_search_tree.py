@@ -1,6 +1,7 @@
 import unittest
 from search_tree import SearchTree
 from game import Game
+from chesslib import *
 from timeit import default_timer as timer
 
 class TestSearchTree(unittest.TestCase):
@@ -12,7 +13,7 @@ class TestSearchTree(unittest.TestCase):
         self.game.quit()
 
     def test_get_all_moves(self):
-        moves = self.tree._get_all_moves(self.game.board, turn=COLORS.WHITE)
+        moves = self.tree._get_all_moves(self.game.board, turn=WHITE)
 
         starting_moves = {((5, 6), (5, 5)), ((6, 7), (7, 5)), ((6, 6), (6, 4)),
                           ((2, 6), (2, 5)), ((1, 7), (0, 5)), ((0, 6), (0, 4)),
@@ -63,7 +64,7 @@ class TestSearchTree(unittest.TestCase):
 
         best_move = self.tree.get_best_move().move
 
-        self.game.full_move(*best_move[0], *best_move[1])
+        self.game.full_move(best_move[0], best_move[1])
 
         self.game.full_move(0, 1, 0, 2)
 
@@ -71,7 +72,7 @@ class TestSearchTree(unittest.TestCase):
 
     def test_get_best_move_checkmate(self):
         self.game.set_board('Presets/almost_checkmate.txt')
-        self.game.set_turn(COLORS.BLACK)
+        self.game.set_turn(BLACK)
 
         self.tree.populate(depth=2)
 
@@ -83,19 +84,19 @@ class TestSearchTree(unittest.TestCase):
     def test_get_best_move_promo_check(self):
         # Test with a pawn promo
         self.game.set_board('Presets/promo_check.txt')
-        self.game.set_turn(COLORS.WHITE)
+        self.game.set_turn(WHITE)
 
         self.tree.populate(depth=2)
 
         best_move = self.tree.get_best_move()
 
         self.assertEqual(best_move.move, ((2, 1), (2, 0)))
-        self.assertEqual(best_move.promo, PIECES.KNIGHT)
+        self.assertEqual(best_move.promo, KNIGHT)
 
     @unittest.expectedFailure
     def test_get_best_move_minimize_capture(self):
         self.game.set_board('Presets/minimize_capture.txt')
-        self.game.set_turn(COLORS.WHITE)
+        self.game.set_turn(WHITE)
 
         # Only works in 4 layers +
         self.tree.populate(depth=2)
@@ -107,7 +108,7 @@ class TestSearchTree(unittest.TestCase):
 
     def test_get_best_move_avoid_check(self):
         self.game.set_board('Presets/avoid_check.txt')
-        self.game.set_turn(COLORS.WHITE)
+        self.game.set_turn(WHITE)
 
         self.tree.populate(depth=2)
 

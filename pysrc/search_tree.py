@@ -17,9 +17,9 @@ class SearchTreeNode(object):
         self.promo = promo
 
         if move_obj:
-            self.move = (move_obj.move_from, move_obj.move_to)
+            self.move = (move_obj.source, move_obj.target)
             self.move_obj = move_obj
-            self.turn = move_obj.move_colour
+            self.turn = move_obj.turn
 
     def evaluate_points(self, orig_turn, next_poss_moves=None):
         """Evaluate points gained in the previous move"""
@@ -146,10 +146,10 @@ class SearchTree(object):
             node.evaluate_points(self.game.turn)
             return
 
-        if turn == COLORS.WHITE:
-            next_turn = COLORS.BLACK
+        if turn == WHITE:
+            next_turn = BLACK
         else:
-            next_turn = COLORS.WHITE
+            next_turn = WHITE
 
         # If the node is already populated, then just keep going
         if node.children != []:
@@ -163,15 +163,13 @@ class SearchTree(object):
         node.evaluate_points(self.game.turn, moves)
 
         for move in moves:
-            if Rules.is_pawn_promo(*move, board):
-                valid_pieces = [PIECES.QUEEN, PIECES.ROOK, PIECES.KNIGHT, PIECES.BISHOP]
+            if Movesets.is_pawn_promo(*move, board):
+                valid_pieces = [QUEEN, ROOK, KNIGHT, BISHOP]
                 for piece in valid_pieces:
                     # Make copy of board
                     new_board = board.copy()
                     # make the current move on the game
-                    move_obj = Move.full_move(*move, new_board)
-                    # make the promo
-                    move_obj.make_pawn_promo(piece, new_board)
+                    move_obj = Move.make_move(*move, new_board, piece)
 
                     # Add the child node
                     child = self._add_child_node(node, move_obj, new_board, piece)
@@ -183,7 +181,7 @@ class SearchTree(object):
                 new_board = board.copy()
 
                 # make the current move on the game
-                move_obj = Move.full_move(*move, new_board)
+                move_obj = Move.make_move(*move, new_board)
 
                 # Add the child node
                 child = self._add_child_node(node, move_obj, new_board)
@@ -199,13 +197,12 @@ class SearchTree(object):
 
     @staticmethod
     def _get_all_moves(board, turn):
-        playable_moves_dict = Move.get_all_poss_moves(board, turn)
+        playable_pieces = Rules.get_playable_piece_coords(turn, board)
 
         playable_moves = set()
 
-        # get all possible next moves
-        for source, targets in playable_moves_dict.items():
-            for target in targets:
+        for source in playable_pieces:
+            for target in Rules.get_moves(source, board):
                 playable_moves.add((source, target))
 
         return playable_moves

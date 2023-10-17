@@ -19,6 +19,11 @@
 
 class Move {
 public:
+    const COORD source;
+    const COORD target;
+    const COLOR turn;
+    const Movesets::MOVE_TYPE type;
+
     ~Move();
     /**
      * @brief Makes a move from source to target and then returns the move object associated
@@ -46,10 +51,14 @@ public:
      */
     const char * __str__() const;
 
+    /**
+     * @brief prints the value of the piece that was captured
+     *
+     * @return unsigned int
+     */
+    unsigned get_captured_value() const;
+
 private:
-    COORD source;
-    COORD target;
-    Movesets::MOVE_TYPE type;
     Piece * captured_piece;
     Piece * promo_piece;
 
@@ -60,7 +69,8 @@ private:
      * @param target
      * @param type
      */
-    Move(COORD source, COORD target, Movesets::MOVE_TYPE type, Piece * captured_piece, Piece * promo_piece);
+    Move(COORD source, COORD target, Movesets::MOVE_TYPE type, Piece * captured_piece, Piece * promo_piece, COLOR turn) :
+        source(source), target(target), turn(turn), type(type), captured_piece(captured_piece), promo_piece(promo_piece) {}
 
 };
 

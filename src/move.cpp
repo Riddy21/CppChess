@@ -18,6 +18,7 @@ Move * Move::make_move(COORD source, COORD target, Board * board, TYPE promotion
     // Make the move
     Piece * captured = nullptr;
     Piece * promo = nullptr;
+    COLOR color = board->get(source)->color;
     switch(move_type){
         case Movesets::MOVE:
             board->set(target, board->get(source));
@@ -67,7 +68,7 @@ Move * Move::make_move(COORD source, COORD target, Board * board, TYPE promotion
         default:
             throw invalid_argument("Move type " + to_string(move_type) + " not implemented");
     }
-    return new Move(source, target, move_type, captured, promo);
+    return new Move(source, target, move_type, captured, promo, color);
 }
 
 void Move::undo_move(Board * board) {
@@ -118,6 +119,12 @@ void Move::undo_move(Board * board) {
     }
 }
 
+unsigned Move::get_captured_value() const {
+    if (captured_piece != nullptr)
+        return captured_piece->value;
+    return 0;
+}
+
 const char * Move::__str__() const {
     string output = "";
 
@@ -133,12 +140,4 @@ const char * Move::__str__() const {
     char * c_str_out = new char[output.length()+1];
     strcpy(c_str_out, output.c_str());
     return c_str_out;
-}
-
-Move::Move(COORD source, COORD target, Movesets::MOVE_TYPE type, Piece * captured_piece, Piece * promo_piece) {
-    this->source = source;
-    this->target = target;
-    this->type = type;
-    this->captured_piece = captured_piece;
-    this->promo_piece = promo_piece;
 }

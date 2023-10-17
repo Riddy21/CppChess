@@ -1,5 +1,6 @@
 import unittest
 import faulthandler
+import sys
 
 from chesslib import *
 
@@ -16,6 +17,8 @@ class TestMove(unittest.TestCase):
 
         # Check that the num_moves has been recorded
         self.assertEqual(board[0, 2].num_moves, 1)
+
+        self.assertEqual(move.turn, BLACK)
 
         # Try undo the move on a different instance of board
         new_board = board.copy()
@@ -40,14 +43,17 @@ class TestMove(unittest.TestCase):
     def test_capture(self):
         board = Board("presets/check.txt")
         # Make the move
-        move = Move.make_move((7, 3), (4, 0), board)
+        move = Move.make_move((7, 3), (7, 1), board)
 
         # Check the move has been made
         self.assertEqual(board[7, 3].type, BLANK)
-        self.assertEqual(board[4, 0].type, QUEEN)
+        self.assertEqual(board[7, 1].type, QUEEN)
 
         # Check that the num_moves has been recorded
-        self.assertEqual(board[4, 0].num_moves, 1)
+        self.assertEqual(board[7, 1].num_moves, 1)
+
+        self.assertEqual(move.turn, WHITE)
+        self.assertEqual(move.get_captured_value(), 1)
 
         # Try undo the move on a different instance of board
         new_board = board.copy()
@@ -59,11 +65,11 @@ class TestMove(unittest.TestCase):
         del move
         # Check that the move has been undone
         self.assertEqual(new_board[7, 3].type, QUEEN)
-        self.assertEqual(new_board[4, 0].type, KING)
+        self.assertEqual(new_board[7, 1].type, PAWN)
 
         # Check the number of moves has been undone
         self.assertEqual(new_board[7, 3].num_moves, 0)
-        self.assertEqual(new_board[4, 0].num_moves, 0)
+        self.assertEqual(new_board[7, 1].num_moves, 0)
 
     def test_enpassante(self):
         board = Board("presets/ready_to_enpass.txt")
@@ -80,6 +86,9 @@ class TestMove(unittest.TestCase):
 
         # Check that the num_moves has been recorded
         self.assertEqual(board[6, 2].num_moves, 1)
+
+        self.assertEqual(move1.turn, BLACK)
+        self.assertEqual(move2.turn, WHITE)
 
         # Try undo the move on a different instance of board
         new_board = board.copy()
@@ -113,6 +122,7 @@ class TestMove(unittest.TestCase):
         self.assertEqual(board[2, 7].num_moves, 1)
         self.assertEqual(board[3, 7].num_moves, 1)
 
+        self.assertEqual(move.turn, WHITE)
         # Try undo the move on a different instance of board
         new_board = board.copy()
         del board
@@ -144,6 +154,8 @@ class TestMove(unittest.TestCase):
         # Check that the num_moves has been recorded
         self.assertEqual(board[6, 7].num_moves, 1)
         self.assertEqual(board[5, 7].num_moves, 1)
+
+        self.assertEqual(move.turn, WHITE)
 
         # Try undo the move on a different instance of board
         new_board = board.copy()
@@ -179,6 +191,7 @@ class TestMove(unittest.TestCase):
         self.assertEqual(board[0, 1].num_moves, 0)
 
         self.assertEqual(board[1, 0].color, WHITE)
+        self.assertEqual(move.turn, WHITE)
 
         # Try undo the move on a different instance of board
         new_board = board.copy()

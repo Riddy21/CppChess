@@ -52,7 +52,7 @@ DEPENDENCIES \
 
 all: build $(OBJECTS) $(SWIG_LIB) $(PY_LIB) unittest systemtest play
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp $(INCLUDE_DIR)/%.h
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
 
 $(APP_DIR)/$(TARGET): $(OBJECTS)
