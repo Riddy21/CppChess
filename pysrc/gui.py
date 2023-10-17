@@ -124,7 +124,7 @@ class ChessboardGUI:
         col, row = self.orient((col, row))
 
         # If it is a pawn promo, pull up the UI to do it
-        promo = self.check_promo(pos)
+        promo = self.check_promo((col, row))
 
         player.handle_move(col, row, promo)
 
