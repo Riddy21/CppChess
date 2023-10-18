@@ -19,8 +19,6 @@
 
 class Move {
 public:
-    const COORD source;
-    const COORD target;
     const COLOR turn;
     const Movesets::MOVE_TYPE type;
 
@@ -58,9 +56,25 @@ public:
      */
     unsigned get_captured_value() const;
 
+    /**
+     * @brief get the source coordinate
+     * 
+     * @return COORD
+     */
+    const COORD get_source() const { return source; }
+
+    /**
+     * @brief get the target coordinate
+     * 
+     * @return COORD
+     */
+    const COORD get_target() const { return target; }
+
 private:
     Piece * captured_piece;
     Piece * promo_piece;
+    const COORD source;
+    const COORD target;
 
     /**
      * @brief Construct the move class, private contructor to be created by static methods
@@ -70,7 +84,7 @@ private:
      * @param type
      */
     Move(COORD source, COORD target, Movesets::MOVE_TYPE type, Piece * captured_piece, Piece * promo_piece, COLOR turn) :
-        source(source), target(target), turn(turn), type(type), captured_piece(captured_piece), promo_piece(promo_piece) {}
+        turn(turn), type(type), captured_piece(captured_piece), promo_piece(promo_piece), source(source), target(target) {};
 
 };
 

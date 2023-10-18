@@ -37,7 +37,7 @@ class TestSearchTree(unittest.TestCase):
 
     def test_promotion(self):
         # Testing when the search tree needs to make pawn promo
-        self.game.set_board('Presets/ready_to_promo.txt')
+        self.game.set_board('Presets/ready_to_promo_no_cap.txt')
 
         start = timer()
         self.tree.populate(depth=2)
@@ -66,7 +66,7 @@ class TestSearchTree(unittest.TestCase):
 
         self.game.full_move(best_move[0], best_move[1])
 
-        self.game.full_move(0, 1, 0, 2)
+        self.game.full_move((0, 1), (0, 2))
 
         self.tree.populate_continue(2, self.game.moves[-2:])
 

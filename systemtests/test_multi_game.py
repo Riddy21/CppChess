@@ -3,6 +3,7 @@ from player import Computer, Human
 import unittest
 from time import sleep
 from utils import run_in_thread
+from chesslib import *
 
 class TestMultiGame(unittest.TestCase):
     def setUp(self):
@@ -12,7 +13,7 @@ class TestMultiGame(unittest.TestCase):
         @run_in_thread
         def is_mate():
             for i in range(1000):
-                if 'mate' not in game.game_state:
+                if game.game_state != Rules.CHECKMATE and game.game_state != Rules.STALEMATE:
                     sleep(0.5)
                 else:
                     return
@@ -31,8 +32,8 @@ class TestMultiGame(unittest.TestCase):
             for i in range(3):
                 print("------ game %d ------" % (i+1))
                 game = Game()
-                ai1 = Computer(game=game, color='black')
-                ai2 = Computer(game=game, color='white')
+                ai1 = Computer(game=game, color=BLACK)
+                ai2 = Computer(game=game, color=WHITE)
                 thread1 = ai1.start()
                 thread2 = ai2.start()
             

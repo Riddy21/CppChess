@@ -56,7 +56,7 @@ class Computer(Player):
 
     def make_move(self):
         # Don't do anything on checkmate or stalemate
-        if 'mate' in self.game.game_state:
+        if self.game.game_state == Rules.CHECKMATE or self.game.game_state == Rules.STALEMATE:
             # Pause
             self.game.switch_turn_event.wait()
             return
@@ -65,17 +65,14 @@ class Computer(Player):
         # Calculate 2 layers deeper if game has already started
         #if self.game.moves:
         #    self.search_tree.populate_continue(depth=2, moves_made=self.game.moves[-2:])
-        self.search_tree.populate(3)
+        self.search_tree.populate(1)
 
         best_move_node = self.search_tree.get_best_move()
 
         move = best_move_node.move
         promo = best_move_node.promo
 
-        self.game.full_move(*move[0], *move[1])
+        self.game.full_move(move[0], move[1], promo)
 
-        # Pawn promo
-        if promo != None:
-            self.game.make_pawn_promo(promo)
         LOCK.release()
 

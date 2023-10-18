@@ -4,6 +4,7 @@ import unittest
 from time import sleep
 from utils import *
 import random
+from chesslib import *
 #from gui import ChessboardGUI
 
 class TestUndoGame(unittest.TestCase):
@@ -14,7 +15,7 @@ class TestUndoGame(unittest.TestCase):
         @run_in_thread
         def is_mate():
             for i in range(1000):
-                if 'mate' not in game.game_state:
+                if game.game_state != Rules.CHECKMATE and game.game_state != Rules.STALEMATE:
                     sleep(0.5)
                 else:
                     return
@@ -33,7 +34,7 @@ class TestUndoGame(unittest.TestCase):
         def undo_on_mate(game, ai1, ai2, num_undos=5):
             # FIXME: Add function to quit if the players throw an exception using the ai1.failed
             for i in range(1000):
-                if 'mate' not in game.game_state:
+                if game.game_state != Rules.CHECKMATE and game.game_state != Rules.STALEMATE:
                     sleep(0.5)
                 else:
                     if num_undos > 0:
@@ -48,8 +49,8 @@ class TestUndoGame(unittest.TestCase):
             # Let game play till stalemate or checkmate
             game = Game()
             game.set_board(config_file="Presets/almost_mate.txt")
-            ai1 = Computer(game=game, color='black')
-            ai2 = Computer(game=game, color='white')
+            ai1 = Computer(game=game, color=BLACK)
+            ai2 = Computer(game=game, color=WHITE)
             #gui = ChessboardGUI(game, ai1, ai2, interactive=False)
             #gui.run()
             thread1 = ai1.start()
@@ -77,8 +78,8 @@ class TestUndoGame(unittest.TestCase):
         running = True
         # Let game play till stalemate or checkmate
         game = Game()
-        ai1 = Computer(game=game, color='black')
-        ai2 = Computer(game=game, color='white')
+        ai1 = Computer(game=game, color=BLACK)
+        ai2 = Computer(game=game, color=WHITE)
         #gui = ChessboardGUI(game, ai1, ai2, interactive=False)
         @run_in_thread
         def random_undo_thread():
@@ -86,7 +87,7 @@ class TestUndoGame(unittest.TestCase):
             for i in range(30):
                 if running == False:
                     return
-                elif 'mate' not in game.game_state:
+                if game.game_state != Rules.CHECKMATE and game.game_state != Rules.STALEMATE:
                     sleep(random.random()*20)
                     ai1.undo_move(random.randint(1, 3))
                 else:

@@ -17,7 +17,7 @@ class SearchTreeNode(object):
         self.promo = promo
 
         if move_obj:
-            self.move = (move_obj.source, move_obj.target)
+            self.move = (move_obj.get_source(), move_obj.get_target())
             self.move_obj = move_obj
             self.turn = move_obj.turn
 
@@ -77,7 +77,7 @@ class SearchTree(object):
         """Populates a prepopulated tree further"""
         if moves_made:
             for move in moves_made:
-                move_tuple = (move.move_from, move.move_to)
+                move_tuple = (move.get_source(), move.get_target())
                 self.root = self.root.children_dict[move_tuple]
                 self.depth -= 1
 
