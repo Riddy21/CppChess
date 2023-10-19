@@ -37,7 +37,7 @@ class TestSearchTree(unittest.TestCase):
 
     def test_promotion(self):
         # Testing when the search tree needs to make pawn promo
-        self.game.set_board('Presets/ready_to_promo_no_cap.txt')
+        self.game.set_board('presets/ready_to_promo_no_cap.txt')
 
         start = timer()
         self.tree.populate(depth=2)
@@ -71,7 +71,7 @@ class TestSearchTree(unittest.TestCase):
         self.tree.populate_continue(2, self.game.moves[-2:])
 
     def test_get_best_move_checkmate(self):
-        self.game.set_board('Presets/almost_checkmate.txt')
+        self.game.set_board('presets/almost_checkmate.txt')
         self.game.set_turn(BLACK)
 
         self.tree.populate(depth=2)
@@ -83,7 +83,7 @@ class TestSearchTree(unittest.TestCase):
 
     def test_get_best_move_promo_check(self):
         # Test with a pawn promo
-        self.game.set_board('Presets/promo_check.txt')
+        self.game.set_board('presets/promo_check.txt')
         self.game.set_turn(WHITE)
 
         self.tree.populate(depth=2)
@@ -95,7 +95,7 @@ class TestSearchTree(unittest.TestCase):
 
     @unittest.expectedFailure
     def test_get_best_move_minimize_capture(self):
-        self.game.set_board('Presets/minimize_capture.txt')
+        self.game.set_board('presets/minimize_capture.txt')
         self.game.set_turn(WHITE)
 
         # Only works in 4 layers +
@@ -107,7 +107,7 @@ class TestSearchTree(unittest.TestCase):
         self.assertEqual(best_move.promo, None)
 
     def test_get_best_move_avoid_check(self):
-        self.game.set_board('Presets/avoid_check.txt')
+        self.game.set_board('presets/avoid_check.txt')
         self.game.set_turn(WHITE)
 
         self.tree.populate(depth=2)

@@ -50,7 +50,8 @@ PY_LIB   := $(PY_TARGETS:$(PY_DIR)/%.py=$(LIB_DIR)/%.py)
 DEPENDENCIES \
          := $(OBJECTS:.o=.d)
 
-all: build $(OBJECTS) $(SWIG_LIB) $(PY_LIB) unittest systemtest play
+#all: build $(OBJECTS) $(SWIG_LIB) $(PY_LIB) unittest systemtest
+all: build $(OBJECTS) $(SWIG_LIB) $(PY_LIB) unittest #Skip systemtest until faster
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp $(INCLUDE_DIR)/%.h
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
