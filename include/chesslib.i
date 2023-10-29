@@ -7,6 +7,7 @@
 #include "movesets.h"
 #include "move.h"
 #include "rules.h"
+#include "search_tree.h"
 %}
 
 %include "settings.h"
@@ -15,5 +16,6 @@
 %include "movesets.h"
 %include "move.h"
 %include "rules.h"
+%include "search_tree.h"
 
 #endif
