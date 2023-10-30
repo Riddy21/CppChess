@@ -7,10 +7,7 @@
 %include "settings.h"
 %include "board.h"
 
-%include <std_unordered_set.i>;
 %include <std_vector.i>;
-
-%template(MOVESET) std::unordered_set<std::array<unsigned, 2>, ArrayHash>;
 %template(TYPE_VECTOR) std::vector<TYPE>;
 
 #endif
@@ -20,8 +17,6 @@
 
 #include "settings.h"
 #include "board.h"
-
-typedef std::unordered_set<COORD, ArrayHash> MOVESET;
 
 class Movesets {
 public:
@@ -51,9 +46,9 @@ public:
      * @param source
      * @param target
      * @param board
-     * @return MOVESET
+     * @return COORDSET 
      */
-    static MOVESET get_moves(COORD source, Board * board);
+    static COORDSET get_moves(COORD source, Board * board);
 
     /**
      * @brief Get all valid promotion types
@@ -116,47 +111,47 @@ private:
      * 
      * @param source 
      * @param board 
-     * @return MOVESET 
+     * @return COORDSET 
      */
-    static MOVESET get_pawn_moves(COORD source, Board * board);
+    static COORDSET get_pawn_moves(COORD source, Board * board);
 
     /**
      * @brief Get enpassante moves from the given board
      * 
      * @param source
      * @param board
-     * @return MOVESET
+     * @return COORDSET 
      * 
      */
-    static MOVESET get_enpassante_moves(COORD source, Board * board);
+    static COORDSET get_enpassante_moves(COORD source, Board * board);
 
     /**
      * @brief Get knight moves from the given board
      * 
      * @param source
      * @param board
-     * @return MOVESET
+     * @return COORDSET 
      * 
      */
-    static MOVESET get_knight_moves(COORD source, Board * board);
+    static COORDSET get_knight_moves(COORD source, Board * board);
 
     /**
      * @brief Get the left castle moves
      * 
      * @param source 
      * @param board 
-     * @return MOVESET 
+     * @return COORDSET 
      */
-    static MOVESET get_left_castle_moves(COORD source, Board * board);
+    static COORDSET get_left_castle_moves(COORD source, Board * board);
 
     /**
      * @brief Get the right castle moves
      * 
      * @param source
      * @param board
-     * @return MOVESET
+     * @return COORDSET 
      */
-    static MOVESET get_right_castle_moves(COORD source, Board * board);
+    static COORDSET get_right_castle_moves(COORD source, Board * board);
 
     /**
      * @brief  Get the diagonal moves from the given board
@@ -164,18 +159,18 @@ private:
      * @param source
      * @param board
      * @param spread The number of squares to spread
-     * @return MOVESET
+     * @return COORDSET 
      */
-    static MOVESET get_diagonal_moves(COORD source, Board * board, unsigned spread=BOARD_WIDTH);
+    static COORDSET get_diagonal_moves(COORD source, Board * board, unsigned spread=BOARD_WIDTH);
     /**
      * @brief Get orthogonal moves from the given board
      * 
      * @param source
      * @param board
      * @param spread The number of squares to spread
-     * @return MOVESET
+     * @return COORDSET 
      */
-    static MOVESET get_orthogonal_moves(COORD source, Board * board, unsigned spread=BOARD_WIDTH);
+    static COORDSET get_orthogonal_moves(COORD source, Board * board, unsigned spread=BOARD_WIDTH);
 };
 
 #endif

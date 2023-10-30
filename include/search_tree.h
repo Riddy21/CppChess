@@ -16,11 +16,57 @@
 #include "settings.h"
 #include "board.h"
 #include "move.h"
+#include "rules.h"
 
 class Node {
+friend class SearchTree;
+public:
+    /**
+     * @brief Construct a new Node object
+     * 
+     */
+    Node(Move * move, Board * board);
+
+    /**
+     * @brief Deconstruct a Node object
+     * 
+     */
+    ~Node();
+
+private:
+    /**
+     * @brief Add children to the node
+     * 
+     * @param node
+     */
+    void add_child(Node * node);
+
+    /**
+     * @brief Calculate the number of points for the node
+     * 
+     * @param move
+     * 
+     * @return unsigned
+     */
+    static unsigned calculate_points(Move * move, Board * board);
+
+    vector<Node *> children;
+    unsigned points;
+    Board * board;
+    TYPE promo;
+    COLOR turn;
 };
 
-class Root : private Node {
+class Root : public Node {
+friend class SearchTree;
+public:
+    /**
+     * @brief Construct a new Root object
+     * 
+     */
+    Root() : Node(nullptr, nullptr) {};
+
+private:
 };
 
 class SearchTree {
@@ -31,7 +77,7 @@ public:
      * @param board 
      * @param color 
      */
-    SearchTree(Board * board, COLOR color);
+    SearchTree(Board * board, COLOR color) : curr_board(board), turn(color) {};
 
     /**
      * @brief Populate the search tree to a certain depth
@@ -53,6 +99,20 @@ public:
      */
     Move * get_best_move();
 
+    /**
+     * @brief Get the number of nodes in the search tree
+     * 
+     * @return unsigned 
+     */
+    unsigned get_num_nodes() { return num_nodes; };
+
+    /**
+     * @brief Get the number of leaves in the search tree
+     * 
+     * @return unsigned 
+     */
+    unsigned get_num_leaves() { return num_leaves; };
+
 private:
     /**
      * @brief Populate the node recursively
@@ -60,7 +120,7 @@ private:
      * @param node 
      * @param level 
      */
-    void populate_node_recursive(Node * node, unsigned level);
+    void populate_node_recursive(Board * board, Node * node, unsigned level);
 
     /**
      * @brief Get the points recursively
@@ -73,9 +133,9 @@ private:
     Node * root;
     Board * curr_board;
     COLOR turn;
-    unsigned depth;
-    unsigned num_nodes;
-    unsigned num_leaves;
+    unsigned depth = 0;
+    unsigned num_nodes = 0;
+    unsigned num_leaves = 0;
 };
 
 #endif

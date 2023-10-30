@@ -36,11 +36,11 @@ Movesets::MOVE_TYPE Movesets::get_move_type(COORD source, COORD target, Board * 
     return INVALID;
 }
 
-MOVESET Movesets::get_moves(COORD source, Board * board){
+COORDSET Movesets::get_moves(COORD source, Board * board){
     // Get the type of the piece
     TYPE type = board->get(source)->type;
-    MOVESET poss_moves;
-    MOVESET add_moves;
+    COORDSET poss_moves;
+    COORDSET add_moves;
     // Get the moves
     switch(type){
         case PAWN:
@@ -126,10 +126,10 @@ Movesets::OBSTRUCT_TYPE Movesets::detect_obstruction(COORD source, COORD target,
     throw invalid_argument("Source cannot equal target");
 }
 
-MOVESET Movesets::get_pawn_moves(COORD source, Board * board){
+COORDSET Movesets::get_pawn_moves(COORD source, Board * board){
     unsigned x = source[0];
     unsigned y = source[1];
-    MOVESET poss_moves;
+    COORDSET poss_moves;
     Movesets::OBSTRUCT_TYPE obstruct;
 
     if (board->get(source)->color == BLACK){
@@ -183,10 +183,10 @@ MOVESET Movesets::get_pawn_moves(COORD source, Board * board){
     return poss_moves;
 }
 
-MOVESET Movesets::get_enpassante_moves(COORD source, Board * board){
+COORDSET Movesets::get_enpassante_moves(COORD source, Board * board){
     unsigned x = source[0];
     unsigned y = source[1];
-    MOVESET poss_moves;
+    COORDSET poss_moves;
 
     COORD right = {x+1, y};
     COORD left = {x-1, y};
@@ -224,10 +224,10 @@ MOVESET Movesets::get_enpassante_moves(COORD source, Board * board){
     return poss_moves;
 }
 
-MOVESET Movesets::get_knight_moves(COORD source, Board * board){
+COORDSET Movesets::get_knight_moves(COORD source, Board * board){
     unsigned x = source[0];
     unsigned y = source[1];
-    MOVESET poss_moves;
+    COORDSET poss_moves;
     Movesets::OBSTRUCT_TYPE obstruct;
 
     // Up
@@ -265,10 +265,10 @@ MOVESET Movesets::get_knight_moves(COORD source, Board * board){
     return poss_moves;
 }
 
-MOVESET Movesets::get_left_castle_moves(COORD source, Board * board){
+COORDSET Movesets::get_left_castle_moves(COORD source, Board * board){
     unsigned x = source[0];
     unsigned y = source[1];
-    MOVESET poss_moves;
+    COORDSET poss_moves;
     Movesets::OBSTRUCT_TYPE obstruct;
 
     // Check if it is a king
@@ -300,10 +300,10 @@ MOVESET Movesets::get_left_castle_moves(COORD source, Board * board){
     return poss_moves;
 }
 
-MOVESET Movesets::get_right_castle_moves(COORD coord, Board * board){
+COORDSET Movesets::get_right_castle_moves(COORD coord, Board * board){
     unsigned x = coord[0];
     unsigned y = coord[1];
-    MOVESET poss_moves;
+    COORDSET poss_moves;
     Movesets::OBSTRUCT_TYPE obstruct;
 
     // Check if it is a king
@@ -332,10 +332,10 @@ MOVESET Movesets::get_right_castle_moves(COORD coord, Board * board){
     return poss_moves;
 }
 
-MOVESET Movesets::get_diagonal_moves(COORD coord, Board * board, unsigned spread){
+COORDSET Movesets::get_diagonal_moves(COORD coord, Board * board, unsigned spread){
     unsigned x = coord[0];
     unsigned y = coord[1];
-    MOVESET poss_moves;
+    COORDSET poss_moves;
 
     Movesets::OBSTRUCT_TYPE obstruct;
 
@@ -378,10 +378,10 @@ MOVESET Movesets::get_diagonal_moves(COORD coord, Board * board, unsigned spread
     return poss_moves;
 }
 
-MOVESET Movesets::get_orthogonal_moves(COORD coord, Board * board, unsigned spread){
+COORDSET Movesets::get_orthogonal_moves(COORD coord, Board * board, unsigned spread){
     unsigned x = coord[0];
     unsigned y = coord[1];
-    MOVESET poss_moves;
+    COORDSET poss_moves;
 
     Movesets::OBSTRUCT_TYPE obstruct;
 
