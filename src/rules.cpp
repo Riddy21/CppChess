@@ -32,7 +32,7 @@ COORDSET Rules::get_playable_piece_coords(COLOR color, Board * board) {
 
 MOVELIST Rules::get_all_playable_moves(COLOR color, Board * board) {
     MOVELIST playable_moves;
-    for (auto & source : get_playable_piece_coords(color, board)){
+    for (COORD source : get_playable_piece_coords(color, board)){
         COORDSET moves = get_moves(source, board);
         for (COORD target : moves){
             playable_moves.push_back({source, target});

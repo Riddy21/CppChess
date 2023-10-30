@@ -17,6 +17,7 @@
 #include "board.h"
 #include "move.h"
 #include "rules.h"
+#include "movesets.h"
 
 class Node {
 friend class SearchTree;
@@ -120,7 +121,7 @@ private:
      * @param node 
      * @param level 
      */
-    void populate_node_recursive(Board * board, Node * node, unsigned level);
+    void populate_node_recursive(Board * board, Node * node, unsigned level, COLOR turn);
 
     /**
      * @brief Get the points recursively
