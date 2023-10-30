@@ -7,13 +7,9 @@
 
 %include <std_array.i>;
 %include <std_except.i>;
-%include <std_unordered_set.i>;
-%include <std_vector.i>;
 
 %template(COORD) std::array<unsigned, 2>;
-%template(COORDSET) std::unordered_set<std::array<unsigned, 2>, ArrayHash>;
 %template(MOVE_COORDS) std::array<std::array<unsigned, 2>, 2>;
-%template(MOVELIST) std::vector<std::array<std::array<unsigned, 2>, 2>>;
 
 %apply char { TYPE };
 
@@ -55,8 +51,7 @@
 
 typedef std::array<unsigned, 2> COORD;
 typedef std::array<COORD, 2> MOVE_COORDS;
-typedef std::unordered_set<COORD, ArrayHash> COORDSET;
-typedef std::vector<MOVE_COORDS> MOVELIST;
+typedef std::unordered_set<COORD, ArrayHash> MOVESET;
 
 enum COLOR{
     WHITE=1,

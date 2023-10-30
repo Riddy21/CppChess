@@ -61,27 +61,18 @@ public:
      * 
      * @param source
      * @param board
-     * @return COORDSET 
+     * @return MOVESET
      */
-    static COORDSET get_moves(COORD source, Board * board);
+    static MOVESET get_moves(COORD source, Board * board);
 
     /**
      * @brief Get all the playable piece coordinates on the board
      * 
      * @param color
      * @param board
-     * @return COORDSET 
+     * @return MOVESET
      */
-    static COORDSET get_playable_piece_coords(COLOR color, Board * board);
-
-    /**
-     * @brief Get all the playable moves on the board
-     * 
-     * @param color
-     * @param board
-     * @return MOVELIST
-     */
-    static MOVELIST get_all_playable_moves(COLOR color, Board * board);
+    static MOVESET get_playable_piece_coords(COLOR color, Board * board);
 
 private:
     /**
@@ -91,9 +82,9 @@ private:
      * @param source 
      * @param board 
      * 
-     * @return COORDSET 
+     * @return MOVESET
      */
-    static COORDSET chk_limit_moves(COORD source, COORDSET poss_moves, Board * board);
+    static MOVESET chk_limit_moves(COORD source, MOVESET poss_moves, Board * board);
 
     /**
      * @brief Get the coordinates of the king

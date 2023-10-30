@@ -19,8 +19,8 @@ bool Rules::can_move(COLOR color, Board * board) {
     return true;
 }
 
-COORDSET Rules::get_playable_piece_coords(COLOR color, Board * board) {
-    COORDSET playable_pieces;
+MOVESET Rules::get_playable_piece_coords(COLOR color, Board * board) {
+    MOVESET playable_pieces;
     for (auto & [coord, piece] : board->items()){
         if (piece->color == color){
             if (!get_moves(coord, board).empty())
@@ -30,16 +30,6 @@ COORDSET Rules::get_playable_piece_coords(COLOR color, Board * board) {
     return playable_pieces;
 }
 
-MOVELIST Rules::get_all_playable_moves(COLOR color, Board * board) {
-    MOVELIST playable_moves;
-    for (auto & source : get_playable_piece_coords(color, board)){
-        COORDSET moves = get_moves(source, board);
-        for (COORD target : moves){
-            playable_moves.push_back({source, target});
-        }
-    }
-    return playable_moves;
-}
 
 Rules::GAME_STATE Rules::get_game_state(COLOR color, Board * board) {
     // if only 2 kings left on the board, stalemate
@@ -65,14 +55,14 @@ Rules::GAME_STATE Rules::get_game_state(COLOR color, Board * board) {
         return NORMAL;
 }
 
-COORDSET Rules::get_moves(COORD source, Board * board) {
-    COORDSET poss_moves = Movesets::get_moves(source, board);
+MOVESET Rules::get_moves(COORD source, Board * board) {
+    MOVESET poss_moves = Movesets::get_moves(source, board);
     poss_moves = chk_limit_moves(source, poss_moves, board);
     return poss_moves;
 }
 
-COORDSET Rules::chk_limit_moves(COORD source, COORDSET poss_moves, Board * board) {
-    COORDSET new_poss_moves = poss_moves;
+MOVESET Rules::chk_limit_moves(COORD source, MOVESET poss_moves, Board * board) {
+    MOVESET new_poss_moves = poss_moves;
     Board * probe_board = board->copy();
     for (COORD target : poss_moves){
         // If the move is a castle and the king is in check, don't do it
