@@ -1,6 +1,5 @@
 import unittest
-import faulthandler
-
+from search_tree import SearchTree
 from game import Game
 from chesslib import *
 from timeit import default_timer as timer
@@ -8,7 +7,7 @@ from timeit import default_timer as timer
 class TestSearchTree(unittest.TestCase):
     def setUp(self):
         self.game = Game()
-        self.tree = SearchTree(self.game.board, self.game.turn)
+        self.tree = SearchTree(self.game)
 
     def tearDown(self):
         self.game.quit()
