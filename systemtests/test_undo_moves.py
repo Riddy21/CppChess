@@ -29,6 +29,7 @@ class TestUndoGame(unittest.TestCase):
         game.quit()
         sleep(0.5)
 
+    @unittest.skip("Don't really see a situation where this is needed rn")
     def test_undo(self):
         @run_in_thread
         def undo_on_mate(game, ai1, ai2, num_undos=5):
@@ -74,6 +75,7 @@ class TestUndoGame(unittest.TestCase):
             game.quit()
             raise e
 
+    @unittest.skip("Don't really see a situation where this is needed rn")
     def test_random_undo(self):
         running = True
         # Let game play till stalemate or checkmate

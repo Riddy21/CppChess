@@ -51,7 +51,7 @@ DEPENDENCIES \
          := $(OBJECTS:.o=.d)
 
 #all: build $(OBJECTS) $(SWIG_LIB) $(PY_LIB) unittest systemtest
-all: build $(OBJECTS) $(SWIG_LIB) $(PY_LIB) unittest #Skip systemtest until faster
+all: build $(OBJECTS) $(SWIG_LIB) $(PY_LIB) unittest systemtest play
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp $(INCLUDE_DIR)/%.h
 	$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
