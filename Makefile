@@ -73,7 +73,7 @@ $(PY_LIB): $(LIB_DIR)/%.py: $(PY_DIR)/%.py
 
 -include $(DEPENDENCIES)
 
-.PHONY: all build clean debug release info unittest $(UTEST_TARGETS) $(SYSTEST_TARGETS) play
+.PHONY: all build clean debug release info unittest $(UTEST_TARGETS) $(SYSTEST_TARGETS) play test
 
 $(UTEST_TARGETS): test_%: $(UTEST_DIR)/test_%.py $(SWIG_LIB) $(PY_LIB)
 	export PYTHONPATH=$(LIB_DIR); python3 -m unittest $< 2>&1 | tee $(LOG_DIR)/$@.py.out
@@ -86,6 +86,8 @@ unittest: $(SWIG_LIB) $(PY_LIB)
 
 systemtest: $(SWIG_LIB) $(PY_LIB)
 	export PYTHONPATH=$(LIB_DIR); python3 -m unittest discover -s $(SYSTEST_DIR) -p "test_*.py" -v 2>&1 | tee $(LOG_DIR)/$@.out
+
+test: unittest systemtest 
 
 play: $(SWIG_LIB) $(PY_LIB)
 	export PYTHONPATH=$(LIB_DIR); python3 main.py
