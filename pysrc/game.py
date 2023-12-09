@@ -72,10 +72,7 @@ class Game:
 
     # switch turns without notifying players
     def switch_turn_quiet(self):
-        if self.turn == WHITE:
-            self.turn = BLACK
-        else:
-            self.turn = WHITE
+        self.turn = Move.get_next_turn(self.turn)
 
         self.update_game_state()
 

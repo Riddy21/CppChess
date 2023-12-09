@@ -34,6 +34,13 @@ public:
     static Move * make_move(COORD source, COORD target, Board * board, TYPE promotion_type = QUEEN);
 
     /**
+     * @brief Switch turns given the original turn
+     * 
+     * @param turn
+     */
+    constexpr static COLOR get_next_turn(COLOR turn){ return (turn==WHITE ? BLACK : WHITE);}
+
+    /**
      * @brief Undos the move on the board
      * 
      * @param move 

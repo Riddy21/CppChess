@@ -141,15 +141,14 @@ class SearchTree(object):
         return points
     
     def _populate_node_recursive(self, node, board, layers_to_go, turn):
+        # End situation where there is no more layers to go
         if layers_to_go == 0:
             self.num_leaves += 1
             node.evaluate_points(self.game.turn)
             return
 
-        if turn == WHITE:
-            next_turn = BLACK
-        else:
-            next_turn = WHITE
+        # switch turns on the 
+        next_turn = Move.get_next_turn(turn)
 
         # If the node is already populated, then just keep going
         if node.children != []:
